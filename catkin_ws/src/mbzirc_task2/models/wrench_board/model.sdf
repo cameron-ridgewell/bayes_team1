@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="wrench_board">
+    <static>false</static>
+    <link name="link">
+    	<!-- orient the model with 90 degree roll and on one end-->
+		<pose>0 0 0.7 1.5708 0 0</pose>
+		<inertial>
+		    <mass>1.0762</mass>
+	        <inertia>
+	          <ixx>0.000708</ixx>
+	          <ixy>-0.000007</ixy>
+	          <ixz>0</ixz>
+	          <iyy>0.001267</iyy>
+	          <iyz>0</iyz>
+	          <izz>0.001974</izz>
+	        </inertia>
+      	</inertial>
+		<visual name="visual">
+			<geometry>
+				<mesh>
+					<!-- model in meters instead of mm-->
+					<scale>0.001 0.001 0.001</scale>
+					<uri>model://wrench_board/meshes/MBZIRC_WrenchBoard.dae</uri>
+				</mesh>
+			</geometry>
+		</visual>
+		<collision name="collision">
+			<geometry>
+				<mesh>
+					<scale>0.001 0.001 0.001</scale>
+					<uri>model://wrench_board/meshes/MBZIRC_WrenchBoard.dae</uri>
+				</mesh>
+			</geometry>
+		</collision>
+	</link>
+	</model>
+</sdf>

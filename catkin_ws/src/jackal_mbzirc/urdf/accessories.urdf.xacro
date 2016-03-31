@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!--
+    As you add to this URDF, please be aware that both the robot and
+    simulation include it. You must retain compatibility with all of
+    the following launch files:
+
+    jackal_viz/launch/view_model.launch
+    jackal_gazebo/launch/jackal_world.launch
+    jackal_base/launch/base.launch
+  -->
+
+  <!-- Macros to generate standoffs for offset payload mounting. -->
+  <xacro:include filename="accessories/standoffs.urdf.xacro" />
+
+  <!-- This optional plate mounts both the upgraded GPS and the Velodyne 3D LIDAR. -->
+  <xacro:include filename="accessories/bridge_plate.urdf.xacro" />
+
+
+  <!-- If enabled, generate the LASER payload (by default, a SICK LMS111). -->
+  <xacro:include filename="accessories/sick_lms1xx.urdf.xacro" />
+  <xacro:if value="$(optenv JACKAL_LASER 0)">
+    <sick_lms1xx_mount prefix="$(optenv JACKAL_LASER_MOUNT front)"
+                       topic="$(optenv JACKAL_LASER_TOPIC scan)" />
+
+    <joint name="$front_laser_mount_joint" type="fixed">
+      <origin xyz="$(optenv JACKAL_LASER_OFFSET 0 0 0)"
+              rpy="$(optenv JACKAL_LASER_RPY 0 0 0)" />
+      <parent link="$(optenv JACKAL_LASER_MOUNT front)_mount" />
+      <child link="$(optenv JACKAL_LASER_MOUNT front)_laser_mount" />
+    </joint>
+  </xacro:if>
+
+  <!-- If enabled, generate the CAMERA payload (by default, a front_camera). -->
+  <xacro:include filename="accessories/front_camera.urdf.xacro" />
+  <xacro:if value="$(optenv JACKAL_FRONT_CAMERA 0)">
+    <front_camera_mount prefix="$(optenv JACKAL_LASER_MOUNT front)"
+                       topic="$(optenv JACKAL_LASER_TOPIC scan)" />
+
+    <joint name="$front_camera_mount_joint" type="fixed">
+      <origin xyz="$(optenv JACKAL_LASER_OFFSET 0 0 0)"
+              rpy="$(optenv JACKAL_LASER_RPY 0 0 0)" />
+      <parent link="$(optenv JACKAL_LASER_MOUNT front)_mount" />
+      <child link="$(optenv JACKAL_LASER_MOUNT front)_camera" />
+    </joint>
+  </xacro:if>
+
+  <!-- If enabled, generate the DEPTH_CAMERA payload (by default, a kinect). -->
+  <xacro:include filename="accessories/kinect_camera.urdf.xacro" />
+  <xacro:if value="$(optenv JACKAL_FRONT_KINECT 0)">
+    <kinect_camera prefix="$(optenv JACKAL_LASER_MOUNT front)"
+                       topic="$(optenv JACKAL_LASER_TOPIC kinect)" />
+
+    <joint name="$front_kinect_mount_joint" type="fixed">
+      <origin xyz="$(optenv JACKAL_LASER_OFFSET 0 0 0)"
+              rpy="$(optenv JACKAL_KINECT_RPY 0 0 0)" />
+      <parent link="$(optenv JACKAL_LASER_MOUNT front)_mount" />
+      <child link="$(optenv JACKAL_LASER_MOUNT front)_kinect" />
+    </joint>
+  </xacro:if>
+
+  <!-- If enabled, generate the upgraded Navsat payload (a Novatel Smart6). -->
+  <xacro:include filename="accessories/novatel_smart6.urdf.xacro" />
+  <xacro:if value="$(optenv JACKAL_NAVSAT 0)">
+    <bridge_plate mount="$(optenv JACKAL_NAVSAT_MOUNT rear)" 
+                  height="$(optenv JACKAL_NAVSAT_HEIGHT 0.1)" />
+    <novatel_smart6 prefix="$(optenv JACKAL_NAVSAT_MOUNT rear)"/>
+
+    <joint name="$(optenv JACKAL_NAVSAT_MOUNT rear)_navsat_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <parent link="$(optenv JACKAL_NAVSAT_MOUNT rear)_bridge" />
+      <child link="$(optenv JACKAL_NAVSAT_MOUNT rear)_navsat" />
+    </joint>
+  </xacro:if>
+
+  
+  <!--
+  <xacro:include filename="accessories/point_grey_flea.urdf.xacro" />
+
+  <xacro:if value="$(arg camera)">
+    <xacro:point_grey_flea3
+      prefix="front" 
+      joint_parent="front_mount"
+      joint_xyz="0.135 0 0.015"
+      joint_rpy="0 0 0"
+      camera_x="0.0754"
+      camera_y="0.029"
+      camera_z="0.035"
+      camera_mass="0.085"
+      hfov="1.0471975512"
+      width="640"
+      height="512"
+      format="R8G8B8"
+      near="0.1"
+      far="300"
+      ns="jackal"
+      frame_id="front_mount"
+      />
+  </xacro:if>
+  -->
+</robot>

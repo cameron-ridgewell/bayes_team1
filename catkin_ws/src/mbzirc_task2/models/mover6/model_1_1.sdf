@@ -1,0 +1,463 @@
+<sdf version='1.4'>
+  <model name='mover6'>
+    <link name='base_link'>
+      <pose>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0.0475 0 -0 0</pose>
+        <mass>0.2</mass>
+        <inertia>
+          <ixx>0.000737917</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000737917</iyy>
+          <iyz>0</iyz>
+          <izz>0.000625</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_link_collision'>
+        <pose>0 0 0.01 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.02</length>
+            <radius>0.1</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_collision_A1fixed'>
+        <pose>0 0 0.085 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.13</length>
+            <radius>0.05</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='base_link_visual'>
+        <pose>0 0 0.01 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.02</length>
+            <radius>0.1</radius>
+          </cylinder>
+        </geometry>
+      </visual>
+      <visual name='base_link_visual_A1fixed'>
+        <pose>0 0 0.085 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.13</length>
+            <radius>0.05</radius>
+          </cylinder>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <link name='Body1'>
+      <pose>0 0 0.1925 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 1.552 -0 0</pose>
+        <mass>0.05</mass>
+        <inertia>
+          <ixx>0.000101667</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000101667</iyy>
+          <iyz>0</iyz>
+          <izz>6.25e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='Body1_collision'>
+        <pose>0 0 0 1.552 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.13</length>
+            <radius>0.05</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='Body1_visual'>
+        <pose>0 0 0 1.552 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.13</length>
+            <radius>0.05</radius>
+          </cylinder>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='Joint0' type='revolute'>
+      <child>Body1</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics/>
+      </axis>
+    </joint>
+    <link name='Body2'>
+      <pose>0 0 0.1925 0 -0 0</pose>
+      <inertial>
+        <pose>0 0.07 0.0435714 1.552 -0 0</pose>
+        <mass>0.07</mass>
+        <inertia>
+          <ixx>0.000488628</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>9.15574e-05</iyy>
+          <iyz>-7.48589e-06</iyz>
+          <izz>0.000526633</izz>
+        </inertia>
+      </inertial>
+      <collision name='Body2_collision'>
+        <pose>0 0.07 0 1.552 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.01</length>
+            <radius>0.05</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='Body2_collision_Body20ben'>
+        <pose>0 0.07 0.21 1.552 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.01</length>
+            <radius>0.05</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='Body2_collision_UpperArm'>
+        <pose>0 0.07 0.095 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.015 0.25</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='Body2_visual'>
+        <pose>0 0.07 0 1.552 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.01</length>
+            <radius>0.05</radius>
+          </cylinder>
+        </geometry>
+      </visual>
+      <visual name='Body2_visual_Body20ben'>
+        <pose>0 0.07 0.21 1.552 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.01</length>
+            <radius>0.05</radius>
+          </cylinder>
+        </geometry>
+      </visual>
+      <visual name='Body2_visual_UpperArm'>
+        <pose>0 0.07 0.095 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.015 0.25</size>
+          </box>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='Joint1' type='revolute'>
+      <child>Body2</child>
+      <parent>Body1</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics/>
+      </axis>
+    </joint>
+    <link name='Body3'>
+      <pose>0 0 0.3825 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0.025 1.552 -0 0</pose>
+        <mass>0.06</mass>
+        <inertia>
+          <ixx>0.000103333</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000100086</iyy>
+          <iyz>-1.40939e-07</iyz>
+          <izz>5.7164e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='Body3_collision'>
+        <pose>0 0 0.02 1.552 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.13</length>
+            <radius>0.04</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='Body3_collision_Body3TopBox'>
+        <pose>0 0 0.05 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.1 0.07 0.04</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='Body3_visual'>
+        <pose>0 0 0.02 1.552 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.13</length>
+            <radius>0.04</radius>
+          </cylinder>
+        </geometry>
+      </visual>
+      <visual name='Body3_visual_Body3TopBox'>
+        <pose>0 0 0.05 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.1 0.07 0.04</size>
+          </box>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='Joint2' type='revolute'>
+      <child>Body3</child>
+      <parent>Body2</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics/>
+      </axis>
+    </joint>
+    <link name='Body4'>
+      <pose>0 0 0.4325 0 -0 0</pose>
+      <inertial>
+        <pose>0.21 0 0 0 1.552 0</pose>
+        <mass>0.02</mass>
+        <inertia>
+          <ixx>0.000240846</ixx>
+          <ixy>0</ixy>
+          <ixz>-3.07561e-06</ixz>
+          <iyy>0.000240903</iyy>
+          <iyz>0</iyz>
+          <izz>2.54448e-06</izz>
+        </inertia>
+      </inertial>
+      <collision name='Body4_collision'>
+        <pose>0.12 0 0 0 1.552 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.3</length>
+            <radius>0.01</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='Body4_collision_Body4Front'>
+        <pose>0.3 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.06 0.04 0.028</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='Body4_visual'>
+        <pose>0.12 0 0 0 1.552 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.3</length>
+            <radius>0.01</radius>
+          </cylinder>
+        </geometry>
+      </visual>
+      <visual name='Body4_visual_Body4Front'>
+        <pose>0.3 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.06 0.04 0.028</size>
+          </box>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='Joint3' type='revolute'>
+      <child>Body4</child>
+      <parent>Body3</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics/>
+      </axis>
+    </joint>
+    <link name='Body5'>
+      <pose>0.3 0 0.4325 0 -0 0</pose>
+      <inertial>
+        <pose>0.03 0 0 0 -0 0</pose>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>2.08333e-06</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.5e-06</iyy>
+          <iyz>0</iyz>
+          <izz>1.5e-06</izz>
+        </inertia>
+      </inertial>
+      <collision name='Body5_collision'>
+        <pose>0.03 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.03 0.04 0.03</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='Body5_visual'>
+        <pose>0.03 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.03 0.04 0.03</size>
+          </box>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='Joint4' type='revolute'>
+      <child>Body5</child>
+      <parent>Body4</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics/>
+      </axis>
+    </joint>
+    <link name='Body6'>
+      <pose>0.35 0 0.4325 0 -0 0</pose>
+      <inertial>
+        <pose>0.00363572 7.7003e-20 6.83463e-05 0 -0 0</pose>
+        <mass>0.022</mass>
+        <inertia>
+          <ixx>4.61849e-06</ixx>
+          <ixy>6.15915e-24</ixy>
+          <ixz>-9.69491e-08</ixz>
+          <iyy>6.07576e-06</iyy>
+          <iyz>1.15783e-25</iyz>
+          <izz>8.52394e-06</izz>
+        </inertia>
+      </inertial>
+      <collision name='Body6_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.04 0.03</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='Body6_collision_GripperBody'>
+        <pose>0 0 0 0 1.552 0</pose>
+        <geometry>
+          <box>
+            <size>0.03 0.06 0.03</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='Body6_collision_GripperFinger1'>
+        <pose>0.0399929 0.01 0.000751809 0.1 1.552 -3.69184e-16</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.01 0.07</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='Body6_collision_GripperFinger2'>
+        <pose>0.0399929 -0.01 0.000751809 -0.1 1.552 3.69184e-16</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.01 0.07</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='Body6_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.04 0.03</size>
+          </box>
+        </geometry>
+      </visual>
+      <visual name='Body6_visual_GripperBody'>
+        <pose>0 0 0 0 1.552 0</pose>
+        <geometry>
+          <box>
+            <size>0.03 0.06 0.03</size>
+          </box>
+        </geometry>
+      </visual>
+      <visual name='Body6_visual_GripperFinger1'>
+        <pose>0.0399929 0.01 0.000751809 0.1 1.552 -3.69184e-16</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.01 0.07</size>
+          </box>
+        </geometry>
+      </visual>
+      <visual name='Body6_visual_GripperFinger2'>
+        <pose>0.0399929 -0.01 0.000751809 -0.1 1.552 3.69184e-16</pose>
+        <geometry>
+          <box>
+            <size>0.01 0.01 0.07</size>
+          </box>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='Joint5' type='revolute'>
+      <child>Body6</child>
+      <parent>Body5</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics/>
+      </axis>
+    </joint>
+  </model>
+</sdf>

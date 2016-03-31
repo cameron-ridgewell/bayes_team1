@@ -1,0 +1,367 @@
+<?xml version="1.0" ?>
+<robot name="mover6" xmlns:xacro="http://www.ros.org/wiki/xacro">
+	<xacro:property name="PI" value="3.1415926535897931"/>
+
+  	<xacro:macro name="cylinder_inertia" params="mass radius length">
+    	<inertia  ixx="${mass*(3*radius*radius+length*length)/12}" ixy="0" ixz="0"
+	              iyy="${mass*(3*radius*radius+length*length)/12}" iyz="0"
+	              izz="${mass*radius*radius/2}" /> 
+ 	</xacro:macro>
+
+ 	<xacro:macro name="box_inertia" params="mass x y z">
+	    <inertia  ixx="${mass*(y*y+z*z)/12}" ixy = "0" ixz = "0"
+	              iyy="${mass*(x*x+z*z)/12}" iyz = "0"
+	              izz="${mass*(x*x+z*z)/12}" /> 
+	</xacro:macro>
+
+ 	<xacro:macro name="cylinder_link" params="name mass radius length rgba xyz rpy">
+			<link name="${name}">
+			<inertial>
+				<origin 
+					  rpy="${rpy}" 
+					  xyz="${xyz}"/>
+				<xacro:cylinder_inertia 
+					  mass="${mass}" 
+					  radius="${radius}"
+					  length="${length}"/>
+				<mass value="${mass}"/>
+			</inertial>
+			<visual>
+				<origin 
+					  rpy="${rpy}" 
+					  xyz="${xyz}"/>
+				<geometry>
+					<cylinder length="${length}" radius="${radius}"/>
+				</geometry>
+				<material name="color">
+					<ambient>${rgba}</ambient>
+				</material>
+			</visual>
+			<collision>
+				<origin 
+					  rpy="${rpy}" 
+					  xyz="${xyz}"/>
+				<geometry>
+					<cylinder length="${length}" radius="${radius}"/>
+				</geometry>
+			</collision>
+		</link>
+	</xacro:macro>
+
+ 	<xacro:macro name="box_link" params="name mass x y z rgba xyz rpy">
+		<link name="${name}">
+			<inertial>
+				<origin 
+					  rpy="${rpy}" 
+					  xyz="${xyz}"/>
+				<xacro:box_inertia 
+					  mass="${mass}" 
+					  x="${x}"
+					  y="${y}"
+					  z="${z}"/>
+				<mass value="${mass}"/>
+			</inertial>
+			<visual>
+				<origin 
+					  rpy="${rpy}" 
+					  xyz="${xyz}"/>
+				<geometry>
+					<box size="${x} ${y} ${z}"/>
+				</geometry>
+				<material name="color">
+					<ambient>${rgba}</ambient>
+				</material>
+			</visual>
+			<collision>
+				<origin 
+					  rpy="${rpy}" 
+					  xyz="${xyz}"/>
+				<geometry>
+					<box size="${x} ${y} ${z}"/>
+				</geometry>
+			</collision>
+		</link>
+	</xacro:macro>
+
+	<xacro:macro name="axis_joint" params="name type axis parent child xyz rpy effort velocity damping friction">
+		<joint name="${name}" type="${type}">
+	    <axis xyz="${axis}"/>
+	    <parent link="${parent}"/>
+	    <child link="${child}"/>
+	    <origin rpy="${rpy}" xyz="${xyz}"/>
+	    <limit effort="${effort}" velocity="${velocity}"/>
+	    <joint_properties damping="${damping}" friction="${friction}"/>
+	  </joint>
+	</xacro:macro>
+	<xacro:macro name="fixed_joint" params="name parent child xyz rpy">
+		<joint name="${name}" type="fixed">
+	    <parent link="${parent}"/>
+	    <child link="${child}"/>
+	    <origin rpy="${rpy}" xyz="${xyz}"/>
+	  </joint>
+	</xacro:macro>
+
+	<xacro:cylinder_link
+		  name="base_link"
+		  mass="0.1"
+		  radius="0.1"
+		  length="0.02"
+		  rgba="0 0 0 0.9"
+		  xyz="0 0 0.01"
+		  rpy="0 0 0"/>
+
+	<xacro:cylinder_link
+		  name="A1fixed"
+		  mass="0.1"
+		  radius="0.05"
+		  length="0.13"
+		  rgba="1 1 1 0.9"
+		  xyz="0 0 0.065"
+		  rpy="0 0 0"/>
+	<xacro:fixed_joint
+		  name="basetoA1fixed"
+		  parent="base_link"
+		  child="A1fixed"
+		  xyz="0 0 0.02"
+		  rpy="0 0 0"/>
+
+	<xacro:cylinder_link
+		  name="Body1"
+		  mass="0.05"
+		  radius="0.05"
+		  length="0.13"
+		  rgba="1 1 1 0.9"
+		  xyz="0 0 0"
+		  rpy="1.552 0 0"/>
+	<xacro:axis_joint
+		  name="Joint0"
+		  type="continuous"
+		  axis="0 0 1"
+		  parent="base_link"
+		  child="Body1"
+		  xyz="0 0 0.1925"
+		  rpy="0 0 0"
+		  effort="100"
+		  velocity="100"
+		  damping="0.0"
+		  friction="0.0"/>
+
+	<xacro:cylinder_link
+		  name="Body2"
+		  mass="0.05"
+		  radius="0.05"
+		  length="0.01"
+		  rgba="1 1 1 0.9"
+		  xyz="0 0.07 0"
+		  rpy="1.552 0 0"/>
+	<xacro:axis_joint
+		  name="Joint1"
+		  type="continuous"
+		  axis="0 1 0"
+		  parent="Body1"
+		  child="Body2"
+		  xyz="0 0 0"
+		  rpy="0 0 0"
+		  effort="100"
+		  velocity="100"
+		  damping="0.0"
+		  friction="0.0"/>
+
+	<xacro:box_link
+		  name="UpperArm"
+		  mass="0.01"
+		  x="0.04"
+		  y="0.015"
+		  z="0.25"
+		  rgba="1 1 1 0.9"
+		  xyz="0 0.07 0.095"
+		  rpy="0 0 0"/>
+	<xacro:fixed_joint
+		  name="A2basetoA2fixed"
+		  parent="Body2"
+		  child="UpperArm"
+		  xyz="0 0 0"
+		  rpy="0 0 0"/>
+
+	<xacro:cylinder_link
+		  name="Body20ben"
+		  mass="0.01"
+		  radius="0.05"
+		  length="0.01"
+		  rgba="1 1 1 0.9"
+		  xyz="0 0.07 0.19"
+		  rpy="1.552 0 0"/>
+	<xacro:fixed_joint
+		  name="A2ArmtoA2Oben"
+		  parent="Body2"
+		  child="Body20ben"
+		  xyz="0 0 0.02"
+		  rpy="0 0 0"/>
+
+	<xacro:cylinder_link
+		  name="Body3"
+		  mass="0.05"
+		  radius="0.04"
+		  length="0.13"
+		  rgba="1 1 1 0.9"
+		  xyz="0 0 0.02"
+		  rpy="1.552 0 0"/>
+	<xacro:axis_joint
+		  name="Joint2"
+		  type="continuous"
+		  axis="0 1 0"
+		  parent="Body2"
+		  child="Body3"
+		  xyz="0 0 0.19"
+		  rpy="0 0 0"
+		  effort="100"
+		  velocity="100"
+		  damping="0.0"
+		  friction="0.0"/>
+
+	<xacro:box_link
+		  name="Body3TopBox"
+		  mass="0.01"
+		  x="0.1"
+		  y="0.07"
+		  z="0.04"
+		  rgba="1 1 1 0.0"
+		  xyz="0 0 0.05"
+		  rpy="0 0 0"/>
+	<xacro:fixed_joint
+		  name="A3basetoA3TopBoxfixed"
+		  parent="Body3"
+		  child="Body3TopBox"
+		  xyz="0 0 0"
+		  rpy="0 0 0"/>
+
+	<xacro:cylinder_link
+		  name="Body4"
+		  mass="0.01"
+		  radius="0.01"
+		  length="0.3"
+		  rgba="0.4 0.4 0.4 0.9"
+		  xyz="0.12 0 0"
+		  rpy="0 1.552 0"/>
+	<xacro:axis_joint
+		  name="Joint3"
+		  type="continuous"
+		  axis="1 0 0"
+		  parent="Body3"
+		  child="Body4"
+		  xyz="0 0 0.05"
+		  rpy="0 0 0"
+		  effort="100"
+		  velocity="100"
+		  damping="0.0"
+		  friction="0.0"/>
+
+	<xacro:box_link
+		  name="Body4Front"
+		  mass="0.01"
+		  x="0.06"
+		  y="0.04"
+		  z="0.028"
+		  rgba="1 1 1 0.9"
+		  xyz="0.3 0 0"
+		  rpy="0 0 0"/>
+	<xacro:fixed_joint
+		  name="A4basetoA4fixed"
+		  parent="Body4"
+		  child="Body4Front"
+		  xyz="0 0 0"
+		  rpy="0 0 0"/>
+
+	<xacro:box_link
+		  name="Body5"
+		  mass="0.01"
+		  x="0.03"
+		  y="0.04"
+		  z="0.03"
+		  rgba="1 1 1 0.9"
+		  xyz="0.03 0 0"
+		  rpy="0 0 0"/>
+	<xacro:axis_joint
+		  name="Joint4"
+		  type="continuous"
+		  axis="0 1 0"
+		  parent="Body4"
+		  child="Body5"
+		  xyz="0.3 0 0"
+		  rpy="0 0 0"
+		  effort="100"
+		  velocity="100"
+		  damping="0.0"
+		  friction="0.0"/>
+	
+	<xacro:box_link
+		  name="Body6"
+		  mass="0.01"
+		  x="0.01"
+		  y="0.04"
+		  z="0.03"
+		  rgba="0 0 0 0.9"
+		  xyz="0 0 0"
+		  rpy="0 0 0"/>
+	<xacro:axis_joint
+		  name="Joint5"
+		  type="continuous"
+		  axis="1 0 0"
+		  parent="Body5"
+		  child="Body6"
+		  xyz="0.05 0 0"
+		  rpy="0 0 0"
+		  effort="100"
+		  velocity="100"
+		  damping="0.0"
+		  friction="0.0"/>
+
+	<xacro:box_link
+		  name="GripperBody"
+		  mass="0.01"
+		  x="0.03"
+		  y="0.06"
+		  z="0.03"
+		  rgba="0.3 0.3 0.3 0.9"
+		  xyz="0 0 0"
+		  rpy="0 0 0"/>
+	<xacro:fixed_joint
+		  name="Gripper1"
+		  parent="Body6"
+		  child="GripperBody"
+		  xyz="0 0 0"
+		  rpy="0 1.552 0"/>
+
+	<xacro:box_link
+		  name="GripperFinger1"
+		  mass="0.001"
+		  x="0.01"
+		  y="0.01"
+		  z="0.07"
+		  rgba="1 1 1 0.9"
+		  xyz="0 0 0.04"
+		  rpy="0.1 0 0"/>
+	<xacro:fixed_joint
+		  name="Gripper2"
+		  parent="GripperBody"
+		  child="GripperFinger1"
+		  xyz="0 0.01 0"
+		  rpy="0 0 0"/>
+
+	<xacro:box_link
+		  name="GripperFinger2"
+		  mass="0.001"
+		  x="0.01"
+		  y="0.01"
+		  z="0.07"
+		  rgba="1 1 1 0.9"
+		  xyz="0 0 0.04"
+		  rpy="-0.1 0 0"/>
+	<xacro:fixed_joint
+		  name="Gripper3"
+		  parent="GripperBody"
+		  child="GripperFinger2"
+		  xyz="0 -0.01 0"
+		  rpy="0 0 0"/>
+
+</robot>

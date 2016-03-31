@@ -1,0 +1,7 @@
+#! /usr/bin/env python
+
+import model_import.model_inst
+
+if __name__ == '__main__':
+    model_import.model_inst.copy_models()
+    print 'complete'

@@ -1,0 +1,8 @@
+prefix=/home/cam/Documents/catkin_ws/install
+
+Name: mbzirc_task2
+Description: Description of mbzirc_task2
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/cam/Documents/catkin_ws/install/lib 
+Requires: 

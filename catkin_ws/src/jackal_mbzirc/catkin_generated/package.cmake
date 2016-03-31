@@ -1,0 +1,7 @@
+set(_CATKIN_CURRENT_PACKAGE "jackal_mbzirc")
+set(jackal_mbzirc_MAINTAINER "cam <ridgewcp@vt.edu>")
+set(jackal_mbzirc_DEPRECATED "")
+set(jackal_mbzirc_VERSION "0.0.0")
+set(jackal_mbzirc_BUILD_DEPENDS "roscpp" "rospy" "roslaunch" "std_msgs")
+set(jackal_mbzirc_RUN_DEPENDS "roscpp" "rospy" "std_msgs" "robot_state_publisher" "urdf" "xacro")
+set(jackal_mbzirc_BUILDTOOL_DEPENDS "catkin")
