@@ -8,10 +8,14 @@ Installation of the required ROS dependencies is automated via the `install.sh` 
 sudo sh install.sh
 ```
 
-This should install the required ROS dependencies that are not present (below)
+This should install the required dependencies that are not present (below)
 
+ * `gazebo2`
  * `jackal_desktop`
  * `jackal_simulator`
+ * `libopencv-nonfree-dev`
+
+Note that OpenCV may already be installed on a fresh install of Ubuntu, and trying to reinstall can prove to be surprisingly problematic. See if the scripts will run before trying to install openCV 
 
 ##World Launch and Control
 To launch the jackal in Gazebo and the corresponding rviz control and visualization, first, perform a `catkin_make` in the `bayes_team1/catkin_ws` directory.
