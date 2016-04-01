@@ -47,8 +47,8 @@ class ImageConverter
     //acquire image frame
     try
     {
-      cv::convertScaleAbs(msg, src, 100, 0.0);
-      //cv_ptr = cv_bridge::toCvShare(msg, sensor_msgs::image_encodings::BGR8);
+      //cv::convertScaleAbs(msg, src, 100, 0.0);
+      cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     }
     catch (cv_bridge::Exception& e)
     {
@@ -56,7 +56,7 @@ class ImageConverter
       return;
     }
 
-  //src = cv_ptr->image;
+  src = cv_ptr->image;
 
   /// Wait until user exit program by pressing a key
   cv::waitKey(3);
