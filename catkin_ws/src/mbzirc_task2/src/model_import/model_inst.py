@@ -24,18 +24,25 @@ def copy(src, dest):
     	return False
     return True
 
-def add_model(name):
+def add_replace_model(name):
+	try:
+		shutil.rmtree(model_dir + '/' + name)
+		print name + ' removed'
+	except OSError as e:
+		#If the error was caused because the source wasn't a directory
+		print 'No existing ' + name + ' model detected'
+
 	if not os.path.isdir(model_dir + '/' + name):
 	 	if (copy(new_model_resource + '/' + name, model_dir + '/' + name)):
 	 		print '\tmodel ' + name + ' added'
 	 	else:
 	 		print '\tERROR copying model ' + name + 'to gazebo models folder'
 	else:
-	 	print '\tmodel ' + name + ' exists'
+	 	print '\tmodel ' + name + ' was unsuccessfully replaced'
 
 
 def copy_models():
 	print 'Copying models from',
 	print os.path.abspath(new_model_resource)
 	for model in os.listdir(new_model_resource):
-		add_model(model)
+		add_replace_model(model)
