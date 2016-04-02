@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.5">
+<sdf version="1.4">
   <model name="wrench_board">
     <static>false</static>
     <link name="link">
@@ -17,6 +17,7 @@
 	        </inertia>
       	</inertial>
 		<visual name="visual">
+			<cast_shadows>false</cast_shadows>
 			<geometry>
 				<mesh>
 					<!-- model in meters instead of mm-->
@@ -24,6 +25,13 @@
 					<uri>model://wrench_board/meshes/MBZIRC_WrenchBoard.dae</uri>
 				</mesh>
 			</geometry>
+			  <material>
+	          <script>
+	            <uri>model://wrench_board/materials/scripts</uri>
+	            <uri>model://wrench_board/materials/textures</uri>
+	            <name>vrc/wood_board</name>
+	          </script>
+	        </material>
 		</visual>
 		<collision name="collision">
 			<geometry>

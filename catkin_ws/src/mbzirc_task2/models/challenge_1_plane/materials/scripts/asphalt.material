@@ -11,9 +11,9 @@ material vrc/asphalt
 			texture_unit
 			{
 				texture tarmac.png
-				filtering anistropic
+				filtering anisotropic
 				max_anisotropy 16
-				scale 0.1 0.1
+				scale 0.01 0.01
 			}
 		}
 	}

@@ -157,10 +157,11 @@
             </mesh>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Wood</name>
-            </script>
+      			<script>
+      				<uri>model://wrench_board/materials/scripts</uri>
+      				<uri>model://wrench_board/materials/textures</uri>
+      				<name>vrc/wood_board</name>
+      			</script>
           </material>
         </visual>
         <collision name='collision'>
@@ -231,6 +232,7 @@
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
+<!--
       <model name='wrench'>
         <pose>0.472051 -0.578338 0.484358 0.000176 -9.5e-05 -0.000113</pose>
         <link name='link'>
@@ -258,15 +260,6 @@
           <wrench>-0 2e-06 -0 0 -0 0</wrench>
         </link>
       </model>
-      <model name='wrench_2'>
-        <pose>0.321862 -0.574561 0.449445 3e-06 6e-06 0.000208</pose>
-        <link name='link'>
-          <pose>0.321862 -0.574561 0.449445 3.1291 -1.5706 -3.1289</pose>
-          <velocity>1e-06 2e-06 -0 1.4e-05 1.3e-05 0.000413</velocity>
-          <acceleration>1e-06 9e-06 -0 0.001244 -0.014193 -0.027826</acceleration>
-          <wrench>0 3e-06 -0 0 -0 0</wrench>
-        </link>
-      </model>
       <model name='wrench_3'>
         <pose>0.271188 -0.577292 0.486274 0 -0 0</pose>
         <link name='link'>
@@ -274,6 +267,16 @@
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+		-->
+      <model name='wrench_2'>
+        <pose>0.321862 -0.574561 0.449445 3e-06 6e-06 0.000208</pose>
+        <link name='link'>
+          <pose>0.321862 -0.574561 0.449445 3.1291 -1.5706 -3.1289</pose>
+          <velocity>1e-06 2e-06 -0 1.4e-05 1.3e-05 0.000413</velocity>
+          <acceleration>1e-06 9e-06 -0 0.001244 -0.014193 -0.027826</acceleration>
+          <wrench>0 3e-06 -0 0 -0 0</wrench>
         </link>
       </model>
       <model name='wrench_board'>
@@ -397,6 +400,7 @@
       </link>
       <pose>21 -9 0 0 -0 0</pose>
     </model>
+    <!--
     <model name='wrench'>
       <static>0</static>
       <link name='link'>
@@ -550,57 +554,6 @@
       </link>
       <pose>0 -1 0 0 -0 0</pose>
     </model>
-    <model name='wrench_2'>
-      <static>0</static>
-      <link name='link'>
-        <pose>0 0 0 3.14159 -1.57059 3.14159</pose>
-        <inertial>
-          <mass>0.3</mass>
-          <inertia>
-            <ixx>7.83668</ixx>
-            <ixy>-3.54875</ixy>
-            <ixz>-2.02334</ixz>
-            <iyy>585.166</iyy>
-            <iyz>-0.005975</iyz>
-            <izz>578.228</izz>
-          </inertia>
-        </inertial>
-        <visual name='visual'>
-          <geometry>
-            <mesh>
-              <scale>0.012 0.012 0.012</scale>
-              <uri>model://5_8_wrench/meshes/5_8_wrench.stl</uri>
-            </mesh>
-          </geometry>
-        </visual>
-        <collision name='collision'>
-          <geometry>
-            <mesh>
-              <scale>0.012 0.012 0.012</scale>
-              <uri>model://5_8_wrench/meshes/5_8_wrench.stl</uri>
-            </mesh>
-          </geometry>
-          <max_contacts>10</max_contacts>
-          <surface>
-            <bounce/>
-            <friction>
-              <ode/>
-            </friction>
-            <contact>
-              <ode/>
-            </contact>
-          </surface>
-        </collision>
-        <velocity_decay>
-          <linear>0</linear>
-          <angular>0</angular>
-        </velocity_decay>
-        <self_collide>0</self_collide>
-        <kinematic>0</kinematic>
-        <gravity>1</gravity>
-      </link>
-      <pose>-1.48384 -2 0 0 -0 0</pose>
-    </model>
     <model name='wrench_3'>
       <static>0</static>
       <link name='link'>
@@ -651,6 +604,58 @@
         <gravity>1</gravity>
       </link>
       <pose>0 -1 0 0 -0 0</pose>
+    </model>
+-->
+    <model name='wrench_2'>
+      <static>0</static>
+      <link name='link'>
+        <pose>0 0 0 3.14159 -1.57059 3.14159</pose>
+        <inertial>
+          <mass>0.3</mass>
+          <inertia>
+            <ixx>7.83668</ixx>
+            <ixy>-3.54875</ixy>
+            <ixz>-2.02334</ixz>
+            <iyy>585.166</iyy>
+            <iyz>-0.005975</iyz>
+            <izz>578.228</izz>
+          </inertia>
+        </inertial>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <scale>0.012 0.012 0.012</scale>
+              <uri>model://5_8_wrench/meshes/5_8_wrench.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <scale>0.012 0.012 0.012</scale>
+              <uri>model://5_8_wrench/meshes/5_8_wrench.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <bounce/>
+            <friction>
+              <ode/>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+          </surface>
+        </collision>
+        <velocity_decay>
+          <linear>0</linear>
+          <angular>0</angular>
+        </velocity_decay>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+      <pose>-1.48384 -2 0 0 -0 0</pose>
     </model>
   </world>
 </sdf>
