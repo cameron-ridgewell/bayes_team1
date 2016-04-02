@@ -1,0 +1,7 @@
+set(_CATKIN_CURRENT_PACKAGE "jackal_joy")
+set(jackal_joy_MAINTAINER "tom <tom@todo.todo>")
+set(jackal_joy_DEPRECATED "")
+set(jackal_joy_VERSION "0.0.0")
+set(jackal_joy_BUILD_DEPENDS "roscpp" "rospy" "std_msgs")
+set(jackal_joy_RUN_DEPENDS "roscpp" "rospy" "std_msgs")
+set(jackal_joy_BUILDTOOL_DEPENDS "catkin")
