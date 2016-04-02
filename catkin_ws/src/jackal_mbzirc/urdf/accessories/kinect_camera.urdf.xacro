@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
 <robot name="kinect_camera" xmlns:xacro="http://ros.org/wiki/xacro">
 	<property name="M_PI" value="3.1415926535"/>
+	<property name="Resolution_Width" value="1280"/>
+	<property name="Resolution_Height" value="1024"/>
+	<property name="Refresh_Rate" value="9"/>
+
 	<xacro:macro name="kinect_camera" params="prefix topic">
 	  	<link name="front_kinect">
 			<visual>
@@ -31,13 +35,13 @@
 		        <camera>
 		          <horizontal_fov>1.047198</horizontal_fov>
 		          <image>
-		            <width>1280</width>
-		            <height>1024</height>
+		            <width>${Resolution_Width}</width>
+		            <height>${Resolution_Height}</height>
 		            <format>R8G8B8</format>
 		          </image>
 		          <clip>
 		            <near>0.05</near>
-		            <far>3</far>
+		            <far>300</far>
 		          </clip>
 		        </camera>
 		        <plugin name="kinect_link_controller" filename="libgazebo_ros_openni_kinect.so">
@@ -45,7 +49,7 @@
 				    <alwaysOn>true</alwaysOn>
 				    <updateRate>1.0</updateRate>
 				    <cameraName>${prefix}_kinect_ir</cameraName>
-				    <imageTopicName>/${prefix}_kinect/depth/image_raw</imageTopicName>
+				    <imageTopicName>/${prefix}_kinect/rgb/image</imageTopicName>
 				    <cameraInfoTopicName>/${prefix}_kinect/depth/camera_info</cameraInfoTopicName>
 				    <depthImageTopicName>/${prefix}_kinect/depth/image_raw</depthImageTopicName>
 				    <depthImageCameraInfoTopicName>/${prefix}_kinect/depth/camera_info</depthImageCameraInfoTopicName>
@@ -67,5 +71,6 @@
 			 	</plugin>
 		    </sensor>
 	    </gazebo>
+
 	</xacro:macro>
 </robot>
