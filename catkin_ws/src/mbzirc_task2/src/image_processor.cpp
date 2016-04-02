@@ -12,64 +12,59 @@
 
 //CV_Bridge Variables
 static const std::string OPENCV_WINDOW = "Kinect Image";
-static const std::string CAMERA_TOPIC = "/front_kinect/depth/image_raw";
-
-//Canny Variables
-cv::Mat src;
+std::string camera_topic = "/front_kinect/rgb/image";
+static const size_t KINECTHEIGHT_RES = 1024;
+static const size_t KINECTWIDTH_RES = 1280;
 
 class ImageConverter
 {
-  ros::NodeHandle nh_;
-  image_transport::ImageTransport it_;
-  image_transport::Subscriber image_sub_;
-  image_transport::Publisher image_pub_;
+	ros::NodeHandle nh_;
+	image_transport::ImageTransport it_;
+	image_transport::Subscriber image_sub_;
+	image_transport::Publisher image_pub_;
 
-  public:
-  ImageConverter(): it_(nh_)
-  {
-    // Subscrive to input video feed and publish output video feed
-    image_sub_ = it_.subscribe(CAMERA_TOPIC, 1, 
-    &ImageConverter::imageCb, this);
-    image_pub_ = it_.advertise("/image_processor/output_video", 1);
-    cv::namedWindow(OPENCV_WINDOW, CV_WINDOW_AUTOSIZE);
-  }
+	public:
+	ImageConverter(): it_(nh_)
+	{
+		// Subscrive to input video feed and publish output video feed
+		image_sub_ = it_.subscribe(camera_topic, 1, 
+		&ImageConverter::imageCb, this);
+		image_pub_ = it_.advertise("/image_processor/image", 1);
+		cv::namedWindow(OPENCV_WINDOW, CV_WINDOW_AUTOSIZE);
+	}
 
-  ~ImageConverter()
-  {
-    cv::destroyWindow(OPENCV_WINDOW);
-  }
+	~ImageConverter()
+	{
+		cv::destroyWindow(OPENCV_WINDOW);
+	}
 
-  void imageCb(const sensor_msgs::ImageConstPtr& msg)
-  {
-    //get image cv::Pointer
-    cv_bridge::CvImagePtr cv_ptr;
+	void imageCb(const sensor_msgs::ImageConstPtr& msg)
+	{
+		//get image cv::Pointer
+		cv_bridge::CvImagePtr cv_ptr;// = cv_bridge::toCvShare(msg);
 
-    //acquire image frame
-    try
-    {
-      //cv::convertScaleAbs(msg, src, 100, 0.0);
-      cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-    }
-    catch (cv_bridge::Exception& e)
-    {
-      ROS_ERROR("cv_bridge exception: %s", e.what());
-      return;
-    }
+		cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
 
-  src = cv_ptr->image;
+		/*
+		 * TODO
+		 * Any actual image analysis here
+		 */
 
-  /// Wait until user exit program by pressing a key
-  cv::waitKey(3);
 
-  // Output modified video stream
-  image_pub_.publish(cv_ptr->toImageMsg());
-  }
+		cv::imshow(OPENCV_WINDOW, cv_ptr->image);
+
+		/// Wait until user exit program by pressing a key
+		cv::waitKey(3);
+		// Output modified video stream
+		image_pub_.publish(cv_ptr->toImageMsg());
+	}
 };
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "image_processor");
-  ImageConverter ic;
-  ros::spin();
-  return 0;
+	//camera_topic = argv[1];
+	ros::init(argc, argv, "image_processor");
+	ImageConverter ic;
+	ros::spin();
+	return 0;
 }
