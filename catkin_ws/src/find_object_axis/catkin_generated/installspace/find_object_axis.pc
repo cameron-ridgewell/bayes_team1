@@ -1,0 +1,8 @@
+prefix=/home/tom/catkin_ws/install
+
+Name: find_object_axis
+Description: Description of find_object_axis
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/tom/catkin_ws/install/lib 
+Requires: 
