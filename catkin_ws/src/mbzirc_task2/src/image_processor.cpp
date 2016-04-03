@@ -10,11 +10,17 @@
 #include "opencv2/calib3d/calib3d.hpp"
 #include "opencv2/nonfree/nonfree.hpp"
 
+#include <tf/transform_listener.h>
+#include <tf/transform_broadcaster.h>
+#include <geometry_msgs/TransformStamped.h>
+#include <geometry_msgs/Twist.h>
+
 //CV_Bridge Variables
 static const std::string OPENCV_WINDOW = "Kinect Image";
 std::string camera_topic = "/front_kinect/rgb/image";
 static const size_t KINECTHEIGHT_RES = 1024;
 static const size_t KINECTWIDTH_RES = 1280;
+
 
 class ImageConverter
 {

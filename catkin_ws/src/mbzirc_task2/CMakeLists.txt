@@ -10,6 +10,8 @@ find_package(catkin REQUIRED COMPONENTS
   jackal_control
   cv_bridge
   image_transport
+  tf2
+  tf2_ros
 )
 
 find_package(OpenCV REQUIRED)
@@ -32,8 +34,13 @@ include_directories(
 
 add_executable(matrix_transform src/matrix_transform.cpp)
 add_executable(image_processor src/image_processor.cpp)
+add_executable(wrench_tf_transform src/wrench_tf_transform.cpp)
 
 target_link_libraries(matrix_transform
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(wrench_tf_transform
   ${catkin_LIBRARIES}
 )
 
