@@ -50,7 +50,7 @@
 				    <updateRate>1.0</updateRate>
 				    <cameraName>${prefix}_kinect_ir</cameraName>
 				    <imageTopicName>/${prefix}_kinect/rgb/image</imageTopicName>
-				    <cameraInfoTopicName>/${prefix}_kinect/depth/camera_info</cameraInfoTopicName>
+				    <cameraInfoTopicName>/${prefix}_kinect/rgb/camera_info</cameraInfoTopicName>
 				    <depthImageTopicName>/${prefix}_kinect/depth/image_raw</depthImageTopicName>
 				    <depthImageCameraInfoTopicName>/${prefix}_kinect/depth/camera_info</depthImageCameraInfoTopicName>
 				    <pointCloudTopicName>/${prefix}_kinect/depth/points</pointCloudTopicName>
@@ -64,6 +64,7 @@
 				    <distortionT1>0.00000001</distortionT1>
 				    <distortionT2>0.00000001</distortionT2>
 				    <CxPrime>0</CxPrime>
+				    <CyPrime>0</CyPrime>
 				    <Cx>0</Cx>
 				    <Cy>0</Cy>
 				    <focalLength>0</focalLength>
