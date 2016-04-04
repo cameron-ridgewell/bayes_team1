@@ -119,8 +119,9 @@
           </geometry>
           <material>
             <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
+              <uri>model://challenge_1_plane/materials/scripts</uri>
+              <uri>model://challenge_1_plane/materials/textures</uri>
+              <name>vrc/asphalt</name>
             </script>
           </material>
         </visual>
