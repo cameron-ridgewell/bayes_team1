@@ -5,6 +5,10 @@ import urllib2
 import time 
 import cv2
 from geometry_msgs.msg import Twist
+import threading
+import sys
+
+newdata = 0
 
 def sendTwist(twistX, twistY):
 	twist = Twist()
@@ -16,13 +20,24 @@ def sendTwist(twistX, twistY):
         twist.angular.z = twistY
 	pub = rospyPublisher = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
 	pub.publish(twist)
-	
+
 def callback(data):
-  
+ 	global newdata
 	rospy.loginfo('axes: ' + str(data.axes))
 	rospy.loginfo('-----------------')
+	if newdata == 0:
+		continuous_thread = threading.Thread(target=runcommandcontinuous)
+		continuous_thread.start()
+	newdata = data
 
-	sendTwist(data.axes[1],data.axes[0])
+def runcommandcontinuous():
+	global newdata
+	while (True):
+		try:
+			if (newdata != 0):
+				sendTwist(newdata.axes[1],newdata.axes[0])
+		except KeyboardInterrupt:
+			break
     
 def listener():
     # In ROS, nodes are uniquely named. If two nodes with the same
@@ -31,7 +46,6 @@ def listener():
     # name for our 'listener' node so that multiple listeners can
     # run simultaneously.
     rospy.init_node('jackal_joy', anonymous=True)
-
     rospy.Subscriber("/joy", Joy, callback)
 
     # spin() simply keeps python from exiting until this node is stopped
