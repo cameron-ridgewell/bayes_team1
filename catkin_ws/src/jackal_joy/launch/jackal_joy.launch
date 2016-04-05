@@ -1,0 +1,7 @@
+<launch>
+	<!-- Nodes -->
+	<node name="joy" pkg="joy" type="joy_node">
+	</node>
+
+	<node name="jackal_joy" pkg="jackal_joy" type="move_joy.py" args="" />
+</launch>

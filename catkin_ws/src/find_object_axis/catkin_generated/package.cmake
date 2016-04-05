@@ -1,7 +1,0 @@
-set(_CATKIN_CURRENT_PACKAGE "find_object_axis")
-set(find_object_axis_MAINTAINER "tom <tom@todo.todo>")
-set(find_object_axis_DEPRECATED "")
-set(find_object_axis_VERSION "0.0.0")
-set(find_object_axis_BUILD_DEPENDS "roscpp" "rospy" "std_msgs" "cv_bridge" "sensor_msgs" "image_transport")
-set(find_object_axis_RUN_DEPENDS "roscpp" "rospy" "std_msgs" "cv_bridge" "image_transport" "sensor_msgs")
-set(find_object_axis_BUILDTOOL_DEPENDS "catkin")

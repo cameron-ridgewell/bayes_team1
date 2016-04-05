@@ -7,11 +7,6 @@
 #include <ros/package.h>
 #include <vector>
 
-void transform_existing_tf(std::string object_name)
-{
-
-}
-
 int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "image_processor");
@@ -60,6 +55,10 @@ int main(int argc, char** argv)
 		    		-transform.getOrigin().y()));
 				tf::Quaternion q;
 				q.setRPY(0, 0, 0);
+				/*
+				 * TODO
+				 * Make the correct import of pose
+				 */
 				newtransform.setRotation(q);
 		    	br.sendTransform(tf::StampedTransform(newtransform, ros::Time::now(), "front_camera_viewpoint", "wrench"));
 		    }
