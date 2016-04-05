@@ -59,6 +59,20 @@
     </joint>
   </xacro:if>
 
+  <!-- If enabled, generate the MOVER6 payload -->
+  <xacro:include filename="accessories/mover6.urdf.xacro" />
+  <xacro:if value="$(optenv JACKAL_MOVER6 0)">
+    <mover6 prefix="$(optenv JACKAL_REAR_MOUNT rear)"
+                       topic="$(optenv JACKAL_REAR_TOPIC mover6)" />
+
+    <joint name="$rear_arm_mount_joint" type="fixed">
+      <origin xyz="0 0 0"
+              rpy="0 0 0" />
+      <parent link="$(optenv JACKAL_REAR_MOUNT rear)_mount" />
+      <child link="mover6_base" />
+    </joint>
+  </xacro:if>
+
   <!-- If enabled, generate the upgraded Navsat payload (a Novatel Smart6). -->
   <xacro:include filename="accessories/novatel_smart6.urdf.xacro" />
   <xacro:if value="$(optenv JACKAL_NAVSAT 0)">
