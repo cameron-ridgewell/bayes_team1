@@ -32,13 +32,13 @@
 	</include>
 	<include file="$(find jackal_control)/launch/control.launch" />
 	<include file="$(find jackal_control)/launch/teleop.launch">
-	<arg name="joystick" value="false"/>
+	<arg name="joystick" value="true"/>
 	</include>
 
 	<!-- Spawn Jackal -->
 	<!--in front of wrenches at -x 0.25 -y -1.5 -z 0 -->
  	<node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
-	    args="-urdf -model jackal -param robot_description -x 15 -y -15 -z 0 -Y 1.571" />
+	    args="-urdf -model jackal -param robot_description -x 0.25 -y -1.5 -z 0 -Y 1.571" />
 
 	<node name="sim_kinect_transformer" pkg="mbzirc_task2" type="matrix_transform"
 	      args="/front_kinect/depth/points" />
@@ -47,24 +47,4 @@
 
 	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find mbzirc_task2)/rviz/$(arg rconfig).rviz" />
 
-	<node name="find_object_2d" pkg="find_object_2d" type="find_object_2d" args="image:=/front_kinect/rgb/image">
-		<param name="gui" value="false" type="bool"/>
-		<param name="objects_path" value="$(find mbzirc_task2)/wrench_objects/" type="str"/>
-		<param name="settings_path" value="~/.ros/find_object_2d.ini" type="str"/>
-		<param name="subscribe_depth" value="true" type="bool"/>
-		<param name="object_prefix" value="object" type="str"/>
-
-		<remap from="rgb/image_rect_color" to="/front_kinect/rgb/image"/>
-		<remap from="depth_registered/image_raw" to="/front_kinect/depth/image_raw"/>
-		<remap from="depth_registered/camera_info" to="/front_kinect/depth/camera_info"/>
-	</node>
-
-	<node name="transform_objects" pkg="mbzirc_task2" type="wrench_tf_transform" args="" />
-
-	<node name="joy" pkg="joy" type="joy_node">
-	</node>
-
-	<node name="jackal_joy" pkg="jackal_joy" type="move_joy.py" args="" />
-
-	<node name="wrench_detection" pkg="mbzirc_task2" type="image_processor" args="" />
 </launch>

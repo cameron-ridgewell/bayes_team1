@@ -1,0 +1,4 @@
+# Front Kinect added, Mover 6 added to rear
+
+JACKAL_FRONT_KINECT=1
+JACKAL_MOVER6=1
