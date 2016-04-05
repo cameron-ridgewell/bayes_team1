@@ -41,7 +41,7 @@
 	    args="-urdf -model jackal -param robot_description -x 15 -y -15 -z 0 -Y 1.571" />
 
 	<node name="sim_kinect_transformer" pkg="mbzirc_task2" type="matrix_transform"
-	      args="/front_kinect/depth/points" />
+	      args="/front_kinect/depth/points" respawn="true"/>
 
 	<arg name="rconfig" default="mbzirc" />
 

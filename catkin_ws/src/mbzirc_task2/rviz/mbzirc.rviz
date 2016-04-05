@@ -6,11 +6,8 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /TF1
+        - /Grid1
         - /TF1/Frames1
-        - /TF1/Tree1
-        - /TF2
-        - /TF2/Frames1
       Splitter Ratio: 0.5
     Tree Height: 803
   - Class: rviz/Selection
@@ -48,7 +45,7 @@ Visualization Manager:
         Y: 0
         Z: 0
       Plane: XY
-      Plane Cell Count: 10
+      Plane Cell Count: 30
       Reference Frame: <Fixed Frame>
       Value: true
     - Alpha: 1
@@ -56,11 +53,81 @@ Visualization Manager:
       Collision Enabled: false
       Enabled: true
       Links:
+        A1fixed:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         All Links Enabled: true
+        Body1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Body2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Body20ben:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Body3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Body3TopBox:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Body4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Body4Front:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Body5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Body6:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         Expand Joint Details: false
         Expand Link Details: false
         Expand Tree: false
+        GripperBody:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        GripperFinger1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        GripperFinger2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         Link Tree Style: Links in Alphabetic Order
+        UpperArm:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         base_link:
           Alpha: 1
           Show Axes: false
@@ -106,6 +173,11 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+        mover6_base:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         navsat_link:
           Alpha: 1
           Show Axes: false
@@ -131,20 +203,6 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
-    - Class: rviz/TF
-      Enabled: false
-      Frame Timeout: 15
-      Frames:
-        All Enabled: false
-      Marker Scale: 1
-      Name: TF
-      Show Arrows: true
-      Show Axes: true
-      Show Names: true
-      Tree:
-        {}
-      Update Interval: 0
-      Value: false
     - Class: rviz/InteractiveMarkers
       Enable Transparency: true
       Enabled: false
@@ -187,47 +245,73 @@ Visualization Manager:
       Enabled: true
       Frame Timeout: 15
       Frames:
+        A1fixed:
+          Value: false
         All Enabled: false
+        Body1:
+          Value: false
+        Body2:
+          Value: false
+        Body20ben:
+          Value: false
+        Body3:
+          Value: false
+        Body3TopBox:
+          Value: false
+        Body4:
+          Value: false
+        Body4Front:
+          Value: false
+        Body5:
+          Value: false
+        Body6:
+          Value: false
+        GripperBody:
+          Value: false
+        GripperFinger1:
+          Value: false
+        GripperFinger2:
+          Value: false
+        UpperArm:
+          Value: false
         base_link:
-          Value: true
+          Value: false
         chassis_link:
-          Value: true
+          Value: false
         fenders_link:
-          Value: true
+          Value: false
         front_camera_viewpoint:
-          Value: true
+          Value: false
         front_kinect:
-          Value: true
+          Value: false
         front_left_wheel_link:
-          Value: true
+          Value: false
         front_mount:
-          Value: true
+          Value: false
         front_right_wheel_link:
-          Value: true
+          Value: false
         imu_link:
-          Value: true
+          Value: false
         mid_mount:
-          Value: true
+          Value: false
+        mover6_base:
+          Value: false
         navsat_link:
-          Value: true
-        object_65:
-          Value: true
-        object_66:
-          Value: true
-        object_69:
-          Value: true
+          Value: false
         object_70:
           Value: true
+        object_97:
+          Value: false
         odom:
-          Value: true
+          Value: false
         rear_left_wheel_link:
-          Value: true
+          Value: false
         rear_mount:
-          Value: true
+          Value: false
         rear_right_wheel_link:
-          Value: true
+          Value: false
         wrench:
-          Value: true
+          Value: false
       Marker Scale: 1
       Name: TF
       Show Arrows: true
@@ -251,16 +335,33 @@ Visualization Manager:
                     front_camera_viewpoint:
                       wrench:
                         {}
-                    object_65:
-                      {}
-                    object_66:
-                      {}
-                    object_69:
-                      {}
                     object_70:
                       {}
+                    object_97:
+                      {}
                 rear_mount:
-                  {}
+                  mover6_base:
+                    A1fixed:
+                      {}
+                    Body1:
+                      Body2:
+                        Body20ben:
+                          {}
+                        Body3:
+                          Body3TopBox:
+                            {}
+                          Body4:
+                            Body4Front:
+                              {}
+                            Body5:
+                              Body6:
+                                GripperBody:
+                                  GripperFinger1:
+                                    {}
+                                  GripperFinger2:
+                                    {}
+                        UpperArm:
+                          {}
               navsat_link:
                 {}
               rear_left_wheel_link:
