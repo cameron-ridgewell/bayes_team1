@@ -19,16 +19,22 @@ void callback(const PointCloud::ConstPtr& sub_msg)
 
 	pcl::PointCloud<pcl::PointXYZRGB> pc;
 	tf::Transform transform;
-	transform.setOrigin( tf::Vector3(0, 0, 0) );
-	tf::Quaternion q;
-  	q.setRPY(3.1415926535897/2, 3.1415926535897, 3.1415926535897/2);
-  	transform.setRotation(q);
-	pcl_ros::transformPointCloud(*sub_msg, pc, transform);
+	try{
+		transform.setOrigin( tf::Vector3(0, 0, 0) );
+		tf::Quaternion q;
+	  	q.setRPY(3.1415926535897/2, 3.1415926535897, 3.1415926535897/2);
+	  	transform.setRotation(q);
+		pcl_ros::transformPointCloud(*sub_msg, pc, transform);
 
-	if (nh.ok())
+		if (nh.ok())
+		{
+			pub.publish (pc);
+			ros::spinOnce ();
+		}
+	}
+	catch(...)
 	{
-		pub.publish (pc);
-		ros::spinOnce ();
+		std::cerr << "ERROR: Matrix Transform Exception!\n";
 	}
 }
 
