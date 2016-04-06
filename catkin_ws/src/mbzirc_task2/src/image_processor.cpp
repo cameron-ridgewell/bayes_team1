@@ -19,16 +19,18 @@
 #include <numeric>
 #include <functional>
 #include <boost/lexical_cast.hpp>
+
+#include <geometry_msgs/Twist.h>
+
 //CV_Bridge Variables
 static const std::string OPENCV_WINDOW = "Kinect Image";
 std::string camera_topic = "/front_kinect/rgb/image";
 static const size_t KINECTHEIGHT_RES = 1024;
 static const size_t KINECTWIDTH_RES = 1280;
 
-float x_pos = 0;
-float y_pos = 0;
-float width = 0;
-float height = 0;
+float x_pos = -1;
+float y_pos = -1;
+float depth = -1;
 
 const size_t DETECTION_MAX = 10;
 
@@ -37,6 +39,8 @@ static const size_t BOUNDING_BOX_LINE_WIDTH = 1;
 static const size_t CROSSHAIR_WIDTH = 10;
 static const size_t BELIEF_WIDTH = 1.5;
 
+tf::StampedTransform previous_transform;
+
 class ImageConverter
 {
 	ros::NodeHandle nh_;
@@ -44,6 +48,7 @@ class ImageConverter
 	image_transport::Subscriber image_sub_;
 	image_transport::Publisher image_pub_;
 	ros::Subscriber object_sub;
+	ros::Subscriber twist_sub;
 	cv::Mat src;
 	std::vector<float> objects;
 	size_t detection_counter;
@@ -69,6 +74,7 @@ class ImageConverter
 
 	void imageCb(const sensor_msgs::ImageConstPtr& msg)
 	{
+		twistPrediction();
 		//get image cv::Pointer
 		cv_bridge::CvImagePtr cv_ptr;// = cv_bridge::toCvShare(msg);
 
@@ -82,6 +88,9 @@ class ImageConverter
 		if (detection_counter >= DETECTION_MAX)
 		{
 			objects.clear();
+			x_pos=-1;
+			y_pos=-1;
+			depth=-1;
 		}
 
 		std::vector<float> heights;
@@ -99,11 +108,7 @@ class ImageConverter
 		}
 		if (objects.size() > 0)
 		{
-			for (int i = 0; i < object_homs.size(); i++)
-			{
-				//smallest_element_index(heights)
-				drawRectFromHomography(object_homs[i]);
-			}
+			drawRectFromHomography(object_homs[smallest_element_index(heights)]);
 		}
 		detection_counter++;
 
@@ -124,6 +129,23 @@ class ImageConverter
 		}
 	}
 
+	void twistPrediction()
+	{
+		try {
+			tf::StampedTransform transform;
+			listener.lookupTransform("/base_link", "/odom", ros::Time(0), transform);
+			float delta_x = transform.getOrigin().x() - previous_transform.getOrigin().x();
+			float delta_y = transform.getOrigin().y() - previous_transform.getOrigin().y();
+			float delta_z = transform.getOrigin().z() - previous_transform.getOrigin().z();
+			float deltaY = 2 * transform.getRotation().angle(previous_transform.getRotation());
+			std::cout << "Rot: " << deltaY * 180 / 3.1415926535 << std::endl;
+		}
+		catch (tf2::TransformException &ex) {
+			ROS_WARN("%s",ex.what());
+			ros::Duration(0.1).sleep();
+	    }
+	}
+
 	void drawRectFromHomography(const float msg[])
 	{
 		//    0      1       2     3    4    5    6    7    8    9  10   11   12
@@ -133,14 +155,15 @@ class ImageConverter
 
 	    try{
 	    	tf::StampedTransform transform;
-			listener.lookupTransform("front_camera_viewpoint", "object_" 
+	    	listener.lookupTransform("front_camera_viewpoint", "object_" 
 				+ boost::lexical_cast<std::string>(msg[0]), ros::Time(0), transform);
 			//These are messed up for some reason and have to be reassigned
 			float x = transform.getOrigin().x();
 			float y = transform.getOrigin().y();
 			float z = transform.getOrigin().z();
+			depth = z;
 
-			std::cout << "(x,y,z): " << x << "," << y << "," << z << std::endl;
+			//std::cout << "(x,y,z): " << x << "," << y << "," << z << std::endl;
 	    }
 	    catch (tf2::TransformException &ex) {
 			ROS_WARN("%s",ex.what());
@@ -183,6 +206,8 @@ class ImageConverter
 
 		cv::Point2f sum  = std::accumulate(outPts.begin(), outPts.end(), cv::Point2f(0,0));
 		cv::Point2f mean(sum.x / outPts.size(), sum.y / outPts.size());
+		x_pos = mean.x;
+		y_pos = mean.y;
 		drawBeliefSpace(mean, 6);
 		drawPrediction(mean);
 	}

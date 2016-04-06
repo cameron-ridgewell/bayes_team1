@@ -66,5 +66,5 @@
 
 	<node name="jackal_joy" pkg="jackal_joy" type="move_joy.py" args="" />
 
-	<node name="wrench_detection" pkg="mbzirc_task2" type="image_processor" args="" />
+<!-- 	<node name="wrench_detection" pkg="mbzirc_task2" type="image_processor" args="" /> -->
 </launch>
