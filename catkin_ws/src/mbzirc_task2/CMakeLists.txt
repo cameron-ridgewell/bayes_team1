@@ -15,7 +15,12 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(OpenCV REQUIRED)
+find_package(PkgConfig)
 
+pkg_check_modules(BFL REQUIRED orocos-bfl)
+
+message("BFL include dirs:" ${BFL_INCLUDE_DIRS})
+message("BFL library dirs:" ${BFL_LIBRARY_DIRS})
 catkin_python_setup()
 
 catkin_package(
@@ -31,10 +36,18 @@ include_directories(
 include_directories(
   ${Open_CV_INCLUDE_DIRS}
 )
+include_directories(
+  ${BFL_INCLUDE_DIRS}
+)
+link_directories(
+  ${BFL_LIBRARY_DIRS}
+)
 
 add_executable(matrix_transform src/matrix_transform.cpp)
 add_executable(image_processor src/image_processor.cpp)
+add_executable(cropper src/cropper.cpp)
 add_executable(wrench_tf_transform src/wrench_tf_transform.cpp)
+add_executable(wrench_linear_kalman src/wrench_linear_kalman.cpp)
 
 target_link_libraries(matrix_transform
   ${catkin_LIBRARIES}
@@ -48,7 +61,14 @@ target_link_libraries(image_processor
   ${catkin_LIBRARIES}
   ${OpenCV_LIBS}
 )
-
+target_link_libraries(cropper
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBS}
+)
+target_link_libraries(wrench_linear_kalman
+  ${catkin_LIBRARIES}
+  ${BFL_LIBRARIES}
+)
 
 catkin_install_python(PROGRAMS bin/model_inst
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
