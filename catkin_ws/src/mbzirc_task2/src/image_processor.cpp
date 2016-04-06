@@ -39,7 +39,15 @@ static const size_t BOUNDING_BOX_LINE_WIDTH = 1;
 static const size_t CROSSHAIR_WIDTH = 10;
 static const size_t BELIEF_WIDTH = 1.5;
 
+//Prediction Variables
 tf::StampedTransform previous_transform;
+static const float HORIZ_FOV_ANGLE = 66.666667;
+bool movement = false;
+const size_t MOVEMENT_MAX = 20;
+size_t movement_counter = 0;
+
+//Kalman Array
+float k_array[6];
 
 class ImageConverter
 {
@@ -48,11 +56,13 @@ class ImageConverter
 	image_transport::Subscriber image_sub_;
 	image_transport::Publisher image_pub_;
 	ros::Subscriber object_sub;
-	ros::Subscriber twist_sub;
 	cv::Mat src;
 	std::vector<float> objects;
 	size_t detection_counter;
 	tf::TransformListener listener;
+	cv::Point2f prediction_mean;
+
+	ros::Publisher k_variables;
 
 	public:
 	ImageConverter(): it_(nh_)
@@ -63,8 +73,10 @@ class ImageConverter
 		object_sub = nh_.subscribe("/objects", 10,
 			&ImageConverter::interceptObjects, this);
 		image_pub_ = it_.advertise("/image_processor/image", 1);
+		k_variables = nh_.advertise<std_msgs::Float32MultiArray>("/kalman_processor", 100);
 		cv::namedWindow(OPENCV_WINDOW, CV_WINDOW_AUTOSIZE);
 		detection_counter = DETECTION_MAX;
+		prediction_mean = cv::Point2f(0,0);
 	}
 
 	~ImageConverter()
@@ -81,6 +93,10 @@ class ImageConverter
 		cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
 
 		src = cv_ptr->image;
+
+		cv::Rect roi(0,0, src.size().width, (2.0/3.0)*src.size().height);
+
+		cv::Mat cropped_image = src(roi);
 		/*
 		 * TODO
 		 * Any actual image analysis here
@@ -91,6 +107,12 @@ class ImageConverter
 			x_pos=-1;
 			y_pos=-1;
 			depth=-1;
+		} else {
+			drawPrediction(prediction_mean);
+		}
+		if (movement_counter >= MOVEMENT_MAX)
+		{
+			movement = false;
 		}
 
 		std::vector<float> heights;
@@ -111,13 +133,18 @@ class ImageConverter
 			drawRectFromHomography(object_homs[smallest_element_index(heights)]);
 		}
 		detection_counter++;
+		movement_counter++;
 
 		 
 		cv::imshow(OPENCV_WINDOW, src);
 		/// Wait until user exit program by pressing a key
 		cv::waitKey(3);
 		// Output modified video stream
-		image_pub_.publish(cv_ptr->toImageMsg());
+		cv_bridge::CvImage out_msg;
+		out_msg.header   = cv_ptr->header; // Same timestamp and tf frame as input image
+		out_msg.encoding = sensor_msgs::image_encodings::TYPE_32FC3; // Or whatever
+		out_msg.image    = cropped_image;
+		image_pub_.publish(out_msg.toImageMsg());
 	}
 
 	void interceptObjects(const std_msgs::Float32MultiArray::ConstPtr& msg)
@@ -137,8 +164,33 @@ class ImageConverter
 			float delta_x = transform.getOrigin().x() - previous_transform.getOrigin().x();
 			float delta_y = transform.getOrigin().y() - previous_transform.getOrigin().y();
 			float delta_z = transform.getOrigin().z() - previous_transform.getOrigin().z();
-			float deltaY = 2 * transform.getRotation().angle(previous_transform.getRotation());
-			std::cout << "Rot: " << deltaY * 180 / 3.1415926535 << std::endl;
+
+			double roll, pitch, yaw, roll2, pitch2, yaw2;
+			tf::Matrix3x3(transform.getRotation()).getRPY(roll, pitch, yaw);
+			tf::Matrix3x3(previous_transform.getRotation()).getRPY(roll2, pitch2, yaw2);
+			yaw = yaw * 180 / 3.1415926535;
+			yaw2 = yaw2 * 180 / 3.1415926535;
+			float delta_yaw = (((yaw - yaw2) < 180) ? (yaw - yaw2) : (yaw2 + 360) - yaw);
+			
+			if (delta_yaw > 1)
+			{
+				movement = true;
+			}
+
+			k_array[3] = delta_x;
+			k_array[4] = delta_y;
+			k_array[5] = delta_yaw;
+			std_msgs::Float32MultiArray msg;
+			std::vector<float> tmp;
+			for (int i = 0; i < (sizeof(k_array)/sizeof(*k_array)); i++)
+			{
+				tmp.push_back(k_array[i]);
+			}
+			msg.data = tmp;
+			k_variables.publish(msg);
+
+			previous_transform = transform;
+			prediction_mean.x = prediction_mean.x - delta_yaw / HORIZ_FOV_ANGLE * src.size().width;
 		}
 		catch (tf2::TransformException &ex) {
 			ROS_WARN("%s",ex.what());
@@ -161,7 +213,9 @@ class ImageConverter
 			float x = transform.getOrigin().x();
 			float y = transform.getOrigin().y();
 			float z = transform.getOrigin().z();
-			depth = z;
+			k_array[0] = z;
+			k_array[1] = x;
+			k_array[2] = y;
 
 			//std::cout << "(x,y,z): " << x << "," << y << "," << z << std::endl;
 	    }
@@ -209,7 +263,10 @@ class ImageConverter
 		x_pos = mean.x;
 		y_pos = mean.y;
 		drawBeliefSpace(mean, 6);
-		drawPrediction(mean);
+		if (detection_counter < 1 && !movement)
+		{
+			prediction_mean = mean;
+		}
 	}
 
 	void drawBeliefSpace(const cv::Point2f point, const int radius)
@@ -219,6 +276,15 @@ class ImageConverter
 
 	void drawPrediction(const cv::Point2f point)
 	{
+		cv::line(src, point - cv::Point2f(CROSSHAIR_WIDTH, 0), point + cv::Point2f(CROSSHAIR_WIDTH, 0), 
+			cv::Scalar(0,0,0), 3);
+		cv::line(src, point - cv::Point2f(0, CROSSHAIR_WIDTH), point + cv::Point2f(0, CROSSHAIR_WIDTH),
+			cv::Scalar(0,0,0), 3);
+	}
+
+	void drawKalmanPrediction(const std_msgs::Float32MultiArray::ConstPtr& msg)
+	{
+		cv::Point2f point = cv::Point2f(msg->data[0], msg->data[1]);
 		cv::line(src, point - cv::Point2f(CROSSHAIR_WIDTH, 0), point + cv::Point2f(CROSSHAIR_WIDTH, 0), 
 			cv::Scalar(0,0,0), 3);
 		cv::line(src, point - cv::Point2f(0, CROSSHAIR_WIDTH), point + cv::Point2f(0, CROSSHAIR_WIDTH),

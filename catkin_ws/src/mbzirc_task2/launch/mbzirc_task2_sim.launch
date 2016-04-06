@@ -47,8 +47,10 @@
 
 	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find mbzirc_task2)/rviz/$(arg rconfig).rviz" />
 
-	<node name="find_object_2d" pkg="find_object_2d" type="find_object_2d" args="image:=/front_kinect/rgb/image">
-		<param name="gui" value="false" type="bool"/>
+	<node name="image_cropper" pkg="mbzirc_task2" type="cropper" args="" />
+
+	<node name="find_object_2d" pkg="find_object_2d" type="find_object_2d">
+		<param name="gui" value="true" type="bool"/>
 		<param name="objects_path" value="$(find mbzirc_task2)/wrench_objects/" type="str"/>
 		<param name="settings_path" value="~/.ros/find_object_2d.ini" type="str"/>
 		<param name="subscribe_depth" value="true" type="bool"/>
@@ -66,5 +68,5 @@
 
 	<node name="jackal_joy" pkg="jackal_joy" type="move_joy.py" args="" />
 
-<!-- 	<node name="wrench_detection" pkg="mbzirc_task2" type="image_processor" args="" /> -->
+	<node name="wrench_detection" pkg="mbzirc_task2" type="image_processor" args="" />
 </launch>
