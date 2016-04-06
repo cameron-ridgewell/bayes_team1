@@ -50,7 +50,7 @@
 	<node name="image_cropper" pkg="mbzirc_task2" type="cropper" args="" />
 
 	<node name="find_object_2d" pkg="find_object_2d" type="find_object_2d">
-		<param name="gui" value="true" type="bool"/>
+		<param name="gui" value="false" type="bool"/>
 		<param name="objects_path" value="$(find mbzirc_task2)/wrench_objects/" type="str"/>
 		<param name="settings_path" value="~/.ros/find_object_2d.ini" type="str"/>
 		<param name="subscribe_depth" value="true" type="bool"/>
