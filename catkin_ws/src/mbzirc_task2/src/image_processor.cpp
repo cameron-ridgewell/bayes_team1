@@ -16,7 +16,9 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/Twist.h>
 #include <vector>
-
+#include <numeric>
+#include <functional>
+#include <boost/lexical_cast.hpp>
 //CV_Bridge Variables
 static const std::string OPENCV_WINDOW = "Kinect Image";
 std::string camera_topic = "/front_kinect/rgb/image";
@@ -30,6 +32,11 @@ float height = 0;
 
 const size_t DETECTION_MAX = 10;
 
+//Formatting variables
+static const size_t BOUNDING_BOX_LINE_WIDTH = 1;
+static const size_t CROSSHAIR_WIDTH = 10;
+static const size_t BELIEF_WIDTH = 1.5;
+
 class ImageConverter
 {
 	ros::NodeHandle nh_;
@@ -40,6 +47,7 @@ class ImageConverter
 	cv::Mat src;
 	std::vector<float> objects;
 	size_t detection_counter;
+	tf::TransformListener listener;
 
 	public:
 	ImageConverter(): it_(nh_)
@@ -71,7 +79,6 @@ class ImageConverter
 		 * TODO
 		 * Any actual image analysis here
 		 */
-		std::cout << "det: " << detection_counter << "\n";
 		if (detection_counter >= DETECTION_MAX)
 		{
 			objects.clear();
@@ -90,10 +97,13 @@ class ImageConverter
 			heights.push_back(arr[1]);
 			object_homs.push_back(arr);
 		}
-		std::cout << "size: " << objects.size() << "\n"; 
 		if (objects.size() > 0)
 		{
-			drawRectFromHomography(object_homs[smallest_element_index(heights)]);
+			for (int i = 0; i < object_homs.size(); i++)
+			{
+				//smallest_element_index(heights)
+				drawRectFromHomography(object_homs[i]);
+			}
 		}
 		detection_counter++;
 
@@ -120,6 +130,23 @@ class ImageConverter
 		//[obj_id, height, width, m11, m12, m13, m21, m22, m23, m2, m31, m32, m33]
 		// Find corners OpenCV
 		// get data
+
+	    try{
+	    	tf::StampedTransform transform;
+			listener.lookupTransform("front_camera_viewpoint", "object_" 
+				+ boost::lexical_cast<std::string>(msg[0]), ros::Time(0), transform);
+			//These are messed up for some reason and have to be reassigned
+			float x = transform.getOrigin().x();
+			float y = transform.getOrigin().y();
+			float z = transform.getOrigin().z();
+
+			std::cout << "(x,y,z): " << x << "," << y << "," << z << std::endl;
+	    }
+	    catch (tf2::TransformException &ex) {
+			ROS_WARN("%s",ex.what());
+			ros::Duration(0.1).sleep();
+	    }
+
 		size_t i=0;
 		int id = (int) msg[i];
 		float objectWidth = msg[i+1];
@@ -149,11 +176,28 @@ class ImageConverter
 					outPts.at(2).x, outPts.at(2).y,
 					outPts.at(3).x, outPts.at(3).y);
 		*/
-		cv::line(src, outPts.at(0), outPts.at(1), cv::Scalar(0,0,255));
-		cv::line(src, outPts.at(1), outPts.at(3), cv::Scalar(0,0,255));
-		cv::line(src, outPts.at(3), outPts.at(2), cv::Scalar(0,0,255));
-		cv::line(src, outPts.at(2), outPts.at(0), cv::Scalar(0,0,255));
-		
+		cv::line(src, outPts.at(0), outPts.at(1), cv::Scalar(0,0,255), BOUNDING_BOX_LINE_WIDTH);
+		cv::line(src, outPts.at(1), outPts.at(3), cv::Scalar(0,0,255), BOUNDING_BOX_LINE_WIDTH);
+		cv::line(src, outPts.at(3), outPts.at(2), cv::Scalar(0,0,255), BOUNDING_BOX_LINE_WIDTH);
+		cv::line(src, outPts.at(2), outPts.at(0), cv::Scalar(0,0,255), BOUNDING_BOX_LINE_WIDTH);
+
+		cv::Point2f sum  = std::accumulate(outPts.begin(), outPts.end(), cv::Point2f(0,0));
+		cv::Point2f mean(sum.x / outPts.size(), sum.y / outPts.size());
+		drawBeliefSpace(mean, 6);
+		drawPrediction(mean);
+	}
+
+	void drawBeliefSpace(const cv::Point2f point, const int radius)
+	{
+		cv::circle(src, point, radius, cv::Scalar(255,0,0), BELIEF_WIDTH);
+	}
+
+	void drawPrediction(const cv::Point2f point)
+	{
+		cv::line(src, point - cv::Point2f(CROSSHAIR_WIDTH, 0), point + cv::Point2f(CROSSHAIR_WIDTH, 0), 
+			cv::Scalar(0,0,0), 3);
+		cv::line(src, point - cv::Point2f(0, CROSSHAIR_WIDTH), point + cv::Point2f(0, CROSSHAIR_WIDTH),
+			cv::Scalar(0,0,0), 3);
 	}
 
 	size_t smallest_element_index(std::vector<float> &array)
