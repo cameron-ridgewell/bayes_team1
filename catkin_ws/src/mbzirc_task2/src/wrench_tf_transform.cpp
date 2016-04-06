@@ -61,6 +61,20 @@ int main(int argc, char** argv)
 				 */
 				newtransform.setRotation(q);
 		    	br.sendTransform(tf::StampedTransform(newtransform, ros::Time::now(), "front_camera_viewpoint", "wrench"));
+		    	
+		    	listener.lookupTransform("odom", *i, 
+		      		ros::Time(0), transform);
+		    	newtransform.setOrigin(tf::Vector3(transform.getOrigin().z(),
+		    		-transform.getOrigin().x(),
+		    		-transform.getOrigin().y()));
+				tf::Quaternion q;
+				q.setRPY(0, 0, 0);
+				/*
+				 * TODO
+				 * Make the correct import of pose
+				 */
+				newtransform.setRotation(q);
+		    	br.sendTransform(tf::StampedTransform(newtransform, ros::Time::now(), "odom", "wrench"));
 		    }
 		    catch (tf2::TransformException &ex) {
 				ROS_WARN("%s",ex.what());
