@@ -1,0 +1,7 @@
+set(_CATKIN_CURRENT_PACKAGE "ip_webcam")
+set(ip_webcam_MAINTAINER "cam <cam@todo.todo>")
+set(ip_webcam_DEPRECATED "")
+set(ip_webcam_VERSION "0.0.0")
+set(ip_webcam_BUILD_DEPENDS "cv_bridge" "roscpp" "rospy" "std_msgs")
+set(ip_webcam_RUN_DEPENDS "cv_bridge" "roscpp" "rospy" "std_msgs")
+set(ip_webcam_BUILDTOOL_DEPENDS "catkin")

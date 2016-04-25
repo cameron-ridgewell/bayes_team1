@@ -1,0 +1,8 @@
+prefix=/home/cam/Documents/catkin_ws/install
+
+Name: ip_webcam
+Description: Description of ip_webcam
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/cam/Documents/catkin_ws/install/lib 
+Requires: 

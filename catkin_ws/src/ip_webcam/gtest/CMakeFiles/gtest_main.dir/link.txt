@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC    -shared -Wl,-soname,libgtest_main.so -o libgtest_main.so CMakeFiles/gtest_main.dir/src/gtest_main.cc.o  -L/home/cam/Documents/catkin_ws/src/ip_webcam/gtest/src -lpthread libgtest.so -lpthread -Wl,-rpath,/home/cam/Documents/catkin_ws/src/ip_webcam/gtest/src:/home/cam/Documents/catkin_ws/src/ip_webcam/gtest 
