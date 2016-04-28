@@ -1,0 +1,6 @@
+<launch>
+	<arg name="camera_ip" default="192.168.1.12" />
+	<arg name="camera_port" default="81"/>
+
+ 	<node name="ip_webcam" pkg="ip_webcam" type="ip_webcam_node"/>
+</launch>
