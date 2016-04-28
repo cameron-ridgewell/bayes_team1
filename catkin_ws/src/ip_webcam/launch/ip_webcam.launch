@@ -3,4 +3,11 @@
 	<arg name="camera_port" default="81"/>
 
  	<node name="ip_webcam" pkg="ip_webcam" type="ip_webcam_node"/>
+
+  <node name="joy_node" pkg="joy" type="joy_node"/>
+
+  <node name="camera_movement_listener" pkg="ip_webcam" type="movement_listener_node.py"/>
+
+  <node name="camera_joystick_listener" pkg="ip_webcam" type="joy_handler.py"/>
+
 </launch>

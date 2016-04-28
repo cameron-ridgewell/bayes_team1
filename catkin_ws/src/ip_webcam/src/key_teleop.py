@@ -39,12 +39,10 @@ def sendCommand(comm):
     ip = rospy.get_param("camera_ip", "192.168.1.12");
     port = rospy.get_param("camera_port", "81");
     url_prefix = 'http://' + ip + ':' + port + '/decoder_control.cgi?loginuse=admin&loginpas=12345'
-    print "here"
     print url_prefix + '&command='+str(comm)+'&onestep=0&14434782369140.2543632062152028&_=1443478236914'
     response = urllib2.urlopen(url_prefix + '&command='+str(comm)+'&onestep=0&14434782369140.2543632062152028&_=1443478236914');
-    print response
     sleep(0.1);
-    urllib2.urlopen(url_prefix +'command=7&onestep=1&14434782369140.2543632062152028&_=1443478236914');
+    urllib2.urlopen(url_prefix +'&command=7&onestep=1&14434782369140.2543632062152028&_=1443478236914');
 
 def main():
 	last = get();

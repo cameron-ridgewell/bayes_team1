@@ -24,8 +24,7 @@ void callback()
 	std::string ip, port; 
 	nh.param<std::string>("camera_ip", ip, "192.168.1.12");
 	nh.param<std::string>("camera_port", port, "81");
-	std::cerr << "Port: " << port << "\nIP: " << ip << std::endl; 
-
+	
 	cameraObject networkCamera;
 	networkCamera.ip = "http://" + ip;
 	networkCamera.port = port;
@@ -44,11 +43,10 @@ void callback()
 	rosImage.header.frame_id = "bar";
 	if(nh.ok())
 	{
-		//capture >> frame;
-		//rosImage.image = frame.clone();
+		capture >> frame;
+		rosImage.image = frame.clone();
 
-		//imagePublisher.publish(rosImage.toImageMsg());
-		std::cerr << "tag\n";
+		imagePublisher.publish(rosImage.toImageMsg());
 		ros::spinOnce();
 	}
 }
