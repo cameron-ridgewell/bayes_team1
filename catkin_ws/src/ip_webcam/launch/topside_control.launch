@@ -1,0 +1,7 @@
+<launch>
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find ip_webcam)/rviz/jackal_ip_view.rviz" />
+
+	<node name="joy" pkg="joy" type="joy_node"/>
+
+	<node name="jackal_joy" pkg="jackal_joy" type="move_joy.py"/>
+</launch>
