@@ -8,7 +8,7 @@ import sys
 
 def sendTwist(twistX, twistY):
     twist = Twist()
-    twist.linear.x = twistX
+    twist.linear.x = -twistX
     twist.linear.y = twistY
     twist.linear.z = 0
     twist.angular.x = 0

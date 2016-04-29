@@ -15,8 +15,9 @@ struct cameraObject{
 	std::string commands;
 };
 
-void callback()
+int main(int argc, char** argv)
 {
+  ros::init(argc, argv, "camera_node");
 	ros::NodeHandle nh;
 	image_transport::ImageTransport it(nh);
 	image_transport::Publisher imagePublisher = it.advertise("/networkCam", 1);
@@ -41,7 +42,7 @@ void callback()
 	rosImage.encoding = "bgr8";
 	rosImage.header.stamp = ros::Time::now();
 	rosImage.header.frame_id = "bar";
-	if(nh.ok())
+	while(nh.ok())
 	{
 		capture >> frame;
 		rosImage.image = frame.clone();
@@ -49,16 +50,7 @@ void callback()
 		imagePublisher.publish(rosImage.toImageMsg());
 		ros::spinOnce();
 	}
-}
 
-int main(int argc, char** argv)
-{
-	ros::init(argc, argv, "camera_node");
-	ros::NodeHandle nh;
-	while (nh.ok())
-	{
-		callback();
-	}
-	return 0;
+  return 0;
 }
 
