@@ -7,4 +7,5 @@
 	  <param name="objects_path" value="$(find ip_webcam)/wrench_objects/" type="str"/>
     <param name="object_prefix" value="object" type="str"/>
   </node>
+  <node name="pan_tilt_correction" pkg="ip_webcam" type="image_processor"/>
 </launch>
