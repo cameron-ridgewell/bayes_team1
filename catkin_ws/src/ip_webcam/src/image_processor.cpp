@@ -38,6 +38,7 @@ class ImageConverter
 	size_t detection_counter;
 	cv::Point2f prediction_mean;
 	ros::Publisher camera_motion;
+	ros::Publisher centerpoint_pub;
 
 	public:
 	ImageConverter(): it_(nh_)
@@ -47,7 +48,7 @@ class ImageConverter
 			&ImageConverter::imageCb, this);
 		object_sub = nh_.subscribe("/objects", 10,
 			&ImageConverter::interceptObjects, this);
-		//k_variables = nh_.advertise<std_msgs::Float32MultiArray>("/kalman_processor", 100);
+		centerpoint_pub = nh_.advertise<std_msgs::Float32MultiArray>("/centerpoint_detected", 1);
 		camera_motion = nh_.advertise<geometry_msgs::Twist>("/ip_camera_motion", 1);
 		// cv::namedWindow(OPENCV_WINDOW, CV_WINDOW_AUTOSIZE);
 		detection_counter = DETECTION_MAX;
@@ -184,6 +185,14 @@ class ImageConverter
 
 		if (detection_counter < 1)
 		{
+			//publish centerpoint data
+			std_msgs::Float32MultiArray msg;
+			std::vector<float> tmp;
+			tmp.push_back(mean.x);
+			tmp.push_back(mean.y);
+			msg.data = tmp;
+			centerpoint_pub.publish(msg);
+
 			prediction_mean = mean;
 			trackObject();
 		}
