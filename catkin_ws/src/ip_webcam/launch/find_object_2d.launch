@@ -2,7 +2,9 @@
 	<!-- Nodes -->
 	<node name="find_object_2d" pkg="find_object_2d" type="find_object_2d" output="screen">
 		<remap from="image" to="networkCam"/>
-		<param name="gui" value="true" type="bool"/>
+		<param name="gui" value="false" type="bool"/>
 		<param name="settings_path" value="$(find ip_webcam)/src/find_object_settings_ORB.ini" type="str"/>
-	</node>
+	  <param name="objects_path" value="$(find ip_webcam)/wrench_objects/" type="str"/>
+    <param name="object_prefix" value="object" type="str"/>
+  </node>
 </launch>
