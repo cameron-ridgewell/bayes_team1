@@ -103,6 +103,41 @@ class ImageConverter
 		}
 	}
 
+	void trackObject()
+	{
+		geometry_msgs::Twist camera_twist = geometry_msgs::Twist();
+
+		if (prediction_mean.y < (src.rows / 2) - (CENTER_BOX_HEIGHT / 2))
+		{
+			// std::cout << "top\n";
+			camera_twist.linear.y = 1;
+		} 
+		else if (prediction_mean.y > (src.rows / 2) + (CENTER_BOX_HEIGHT / 2))
+		{
+			// std::cout << "bottom\n";
+			camera_twist.linear.y = -1;
+		}
+
+		if (prediction_mean.x < (src.cols / 2) - (CENTER_BOX_WIDTH / 2))
+		{
+			// std::cout << "left\n";
+			camera_twist.linear.x = 1;
+		} 
+		else if (prediction_mean.x > (src.cols / 2) + (CENTER_BOX_WIDTH / 2))
+		{
+			// std::cout << "right\n";
+			camera_twist.linear.x = -1;
+		}
+		
+		std::cout << "(" << mean.x << ", " << mean.y << ")\n";
+		
+		if(camera_twist.linear.x != 0 || camera_twist.linear.y != 0)
+		{
+			camera_motion.publish(camera_twist);
+			camera_motion.publish(camera_twist);
+		}
+	}
+
 	void drawRectFromHomography(const float msg[])
 	{
 		//    0      1       2     3    4    5    6    7    8    9  10   11   12
@@ -146,42 +181,11 @@ class ImageConverter
 
 		cv::Point2f sum  = std::accumulate(outPts.begin(), outPts.end(), cv::Point2f(0,0));
 		cv::Point2f mean(sum.x / outPts.size(), sum.y / outPts.size());
-		
-		geometry_msgs::Twist camera_twist = geometry_msgs::Twist();
-
-		if (mean.y < (src.rows / 2) - (CENTER_BOX_HEIGHT / 2))
-		{
-			// std::cout << "top\n";
-			camera_twist.linear.y = 1;
-		} 
-		else if (mean.y > (src.rows / 2) + (CENTER_BOX_HEIGHT / 2))
-		{
-			// std::cout << "bottom\n";
-			camera_twist.linear.y = -1;
-		}
-
-		if (mean.x < (src.cols / 2) - (CENTER_BOX_WIDTH / 2))
-		{
-			// std::cout << "left\n";
-			camera_twist.linear.x = 1;
-		} 
-		else if (mean.x > (src.cols / 2) + (CENTER_BOX_WIDTH / 2))
-		{
-			// std::cout << "right\n";
-			camera_twist.linear.x = -1;
-		}
-		
-		std::cout << "(" << mean.x << ", " << mean.y << ")\n";
-		
-		if(camera_twist.linear.x != 0 || camera_twist.linear.y != 0)
-		{
-			camera_motion.publish(camera_twist);
-			camera_motion.publish(camera_twist);
-		}
 
 		if (detection_counter < 1)
 		{
 			prediction_mean = mean;
+			trackObject();
 		}
 	}
 
