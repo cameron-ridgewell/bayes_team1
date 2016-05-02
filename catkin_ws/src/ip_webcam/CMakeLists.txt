@@ -52,6 +52,7 @@ include_directories(
 
 ## Declare a C++ executable
 add_executable(ip_webcam_node src/ip_webcam_node.cpp)
+add_executable(image_processor src/image_processor.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
@@ -60,7 +61,9 @@ add_executable(ip_webcam_node src/ip_webcam_node.cpp)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(ip_webcam_node
   ${catkin_LIBRARIES}
+  ${OpenCV_LIBS}
 )
-target_link_libraries(ip_webcam_node
+target_link_libraries(image_processor
+  ${catkin_LIBRARIES}
   ${OpenCV_LIBS}
 )
