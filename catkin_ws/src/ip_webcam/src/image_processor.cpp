@@ -129,7 +129,7 @@ class ImageConverter
 			camera_twist.linear.x = -1;
 		}
 		
-		std::cout << "(" << mean.x << ", " << mean.y << ")\n";
+		std::cout << "(" << prediction_mean.x << ", " << prediction_mean.y << ")\n";
 		
 		if(camera_twist.linear.x != 0 || camera_twist.linear.y != 0)
 		{
