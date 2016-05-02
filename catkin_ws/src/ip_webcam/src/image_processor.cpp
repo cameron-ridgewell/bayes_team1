@@ -151,38 +151,31 @@ class ImageConverter
 
 		if (mean.y < (src.rows / 2) - (CENTER_BOX_HEIGHT / 2))
 		{
-			std::cout << "top\n";
+			// std::cout << "top\n";
 			camera_twist.linear.y = 1;
 		} 
 		else if (mean.y > (src.rows / 2) + (CENTER_BOX_HEIGHT / 2))
 		{
-			std::cout << "bottom\n";
+			// std::cout << "bottom\n";
 			camera_twist.linear.y = -1;
-		}
-		else 
-		{
-			std::cout << "centery\n";
 		}
 
 		if (mean.x < (src.cols / 2) - (CENTER_BOX_WIDTH / 2))
 		{
-			std::cout << "left\n";
+			// std::cout << "left\n";
 			camera_twist.linear.x = 1;
 		} 
 		else if (mean.x > (src.cols / 2) + (CENTER_BOX_WIDTH / 2))
 		{
-			std::cout << "right\n";
+			// std::cout << "right\n";
 			camera_twist.linear.x = -1;
-		}
-		else 
-		{
-			std::cout << "centerx\n";
 		}
 		
 		std::cout << "(" << mean.x << ", " << mean.y << ")\n";
 		
 		if(camera_twist.linear.x != 0 || camera_twist.linear.y != 0)
 		{
+			camera_motion.publish(camera_twist);
 			camera_motion.publish(camera_twist);
 		}
 
