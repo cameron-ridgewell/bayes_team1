@@ -16,10 +16,10 @@ def getTwist(twist):
 	    return 2;
     elif (x > THRES and y > -THRES and y < THRES):
         # right
-	    return 6;
+	    return 4;
     elif (x < -THRES and y > -THRES and y < THRES):
         # left
-	    return 4;
+	    return 6;
     elif (x < -THRES and y < -THRES):
         # down-left
         return 92;
