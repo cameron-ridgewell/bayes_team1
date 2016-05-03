@@ -47,6 +47,7 @@ class KalmanProcessor
 	Eigen::Matrix2f predicted_cov;
 	Eigen::MatrixXf estimated_pos;
 	Eigen::Matrix2f estimated_cov;
+	float camera_pos[2];
 	bool initialized;
 
 	public:
@@ -58,12 +59,13 @@ class KalmanProcessor
 		object_sub = nh_.subscribe("/centerpoint_detected", 10,
 			&KalmanProcessor::update, this);
 		camera_angle_sub = nh_.subscribe("/ip_camera_angle", 10,
-			&KalmanProcessor::update, this);
+			&KalmanProcessor::update_camera_angle, this);
 		detection_counter = DETECTION_MAX;
 		predicted_pos = Eigen::MatrixXf(2,1);
 		predicted_cov = Eigen::Matrix2f();
 		estimated_pos = Eigen::MatrixXf(2,1);
 		estimated_cov = Eigen::Matrix2f();
+		camera_pos = {0, 0};
 		initialized = false;
 	}
 
@@ -116,6 +118,11 @@ class KalmanProcessor
 		H.setIdentity();
 		Eigen::MatrixXf resid = z_k - (H * predicted_pos);
 		
+	}
+
+	void update_camera_angle(const geometry_msgs::Twist& twist)
+	{
+
 	}
 };
 
