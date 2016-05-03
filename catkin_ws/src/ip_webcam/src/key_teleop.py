@@ -2,6 +2,7 @@
 import sys,tty,termios
 import urllib2, rospy
 from time import sleep
+from geometry_msgs.msg import Twist
 
 class _Getch:
     def __call__(self):
@@ -36,15 +37,21 @@ def get():
 		return -1;
 
 def sendCommand(comm):
-    ip = rospy.get_param("camera_ip", "192.168.1.12");
-    port = rospy.get_param("camera_port", "81");
-    url_prefix = 'http://' + ip + ':' + port + '/decoder_control.cgi?loginuse=admin&loginpas=12345'
-    print url_prefix + '&command='+str(comm)+'&onestep=0&14434782369140.2543632062152028&_=1443478236914'
-    response = urllib2.urlopen(url_prefix + '&command='+str(comm)+'&onestep=0&14434782369140.2543632062152028&_=1443478236914');
-    sleep(0.1);
-    urllib2.urlopen(url_prefix +'&command=7&onestep=1&14434782369140.2543632062152028&_=1443478236914');
+	twist = Twist()
+	if (comm == 0):
+		twist.linear.y = 1
+	elif (comm == 2):
+		twist.linear.y = -1
+	elif (comm == 4):
+		twist.linear.x = 1
+	elif (comm == 6):
+		twist.linear.x = -1
+	if (comm >= 0):
+		pub = rospyPublisher = rospy.Publisher("/ip_camera_motion", Twist, queue_size=10)
+		pub.publish(twist)
 
 def main():
+	rospy.init_node('key_teleop', anonymous=True)
 	last = get();
         while(last >= 0):
 			last = get()

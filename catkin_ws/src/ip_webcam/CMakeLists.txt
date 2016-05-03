@@ -10,9 +10,11 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  cmake_modules
 )
 
 find_package(OpenCV REQUIRED)
+find_package(Eigen REQUIRED)
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
@@ -35,9 +37,8 @@ catkin_package(
 # include_directories(include)
 include_directories(
   ${Open_CV_INCLUDE_DIRS}
-)
-include_directories(
   ${catkin_INCLUDE_DIRS}
+  ${Eigen_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -53,6 +54,7 @@ include_directories(
 ## Declare a C++ executable
 add_executable(ip_webcam_node src/ip_webcam_node.cpp)
 add_executable(image_processor src/image_processor.cpp)
+add_executable(kalman_processor src/kalman_processor.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
@@ -64,6 +66,10 @@ target_link_libraries(ip_webcam_node
   ${OpenCV_LIBS}
 )
 target_link_libraries(image_processor
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBS}
+)
+target_link_libraries(kalman_processor
   ${catkin_LIBRARIES}
   ${OpenCV_LIBS}
 )
