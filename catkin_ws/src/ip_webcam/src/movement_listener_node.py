@@ -11,6 +11,8 @@ x_deg_pos = 0;
 y_deg_pos = 0;
 
 def getTwist(twist):
+    global x_deg_pos
+    global y_deg_pos
     THRES = 0.85
     x = twist.linear.x
     y = twist.linear.y
@@ -54,6 +56,9 @@ def getTwist(twist):
         return -1;
 
 def sendOneMovement(comm):
+    global x_deg_pos
+    global y_deg_pos
+    
     if comm < 0:
         return;
     ip = rospy.get_param("camera_ip", "192.168.1.12");
