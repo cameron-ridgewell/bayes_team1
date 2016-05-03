@@ -24,8 +24,8 @@ static const float CAMERA_SENSOR_X_VAR = 40.9405;
 static const float CAMERA_SENSOR_Y_VAR = 921.5028;
 
 //x and y variance of motion of the pan tilt camera
-static const float CAMERA_MOTION_X_VAR = 0;
-static const float CAMERA_MOTION_Y_VAR = 0;
+static const float CAMERA_MOTION_X_VAR = 0.0381116;
+static const float CAMERA_MOTION_Y_VAR = 0.0486310;
 
 std::string camera_topic = "/networkCam";
 
