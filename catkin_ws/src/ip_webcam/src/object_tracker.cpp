@@ -216,7 +216,7 @@ class ImageConverter
 int main(int argc, char** argv)
 {
 	//camera_topic = argv[1];
-	ros::init(argc, argv, "image_processor");
+	ros::init(argc, argv, "object_tracker");
 	ImageConverter ic;
 	ros::spin();
 	return 0;

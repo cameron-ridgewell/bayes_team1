@@ -7,7 +7,6 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
   pcl_ros
-  jackal_control
   cv_bridge
   image_transport
   tf2
