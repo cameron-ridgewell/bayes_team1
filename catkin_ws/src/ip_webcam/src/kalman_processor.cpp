@@ -47,7 +47,8 @@ class KalmanProcessor
 	Eigen::Matrix2f predicted_cov;
 	Eigen::MatrixXf estimated_pos;
 	Eigen::Matrix2f estimated_cov;
-	float camera_pos[2];
+	float last_used_camera_pos[2];
+	float last_read_camera_pos[2];
 	bool initialized;
 
 	public:
@@ -66,8 +67,10 @@ class KalmanProcessor
 		predicted_cov = Eigen::Matrix2f();
 		estimated_pos = Eigen::MatrixXf(2,1);
 		estimated_cov = Eigen::Matrix2f();
-		camera_pos[0] = 0;
-		camera_pos[1] = 0;
+		last_used_camera_pos[0] = 0;
+		last_used_camera_pos[1] = 0;
+		last_read_camera_pos[0] = 0;
+		last_read_camera_pos[1] = 0;
 		initialized = false;
 	}
 
@@ -160,8 +163,8 @@ class KalmanProcessor
 
 	void update_camera_angle(const geometry_msgs::Twist& twist)
 	{
-		twist.angular.z; //yaw
-		twist.angular.x; //pitch
+		last_read_camera_pos[0] = twist.angular.z; //yaw
+		last_read_camera_pos[1] = twist.angular.x; //pitch
 	}
 
 	void drawCircle(const cv::Point2f point, const int radius, const size_t circle_width)

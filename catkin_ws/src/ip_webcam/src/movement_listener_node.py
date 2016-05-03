@@ -17,19 +17,19 @@ def getTwist(twist):
     if (x < THRES and x > -THRES and y > THRES):
         # up
         y_deg_pos += y_average_degs
-	    return 0;
+        return 0;
     elif (x < THRES and x > -THRES and y < -THRES):
         # down
         y_deg_pos -= y_average_degs
-	    return 2;
+        return 2;
     elif (x > THRES and y > -THRES and y < THRES):
         # right
         x_deg_pos += x_average_degs
-	    return 4;
+        return 4;
     elif (x < -THRES and y > -THRES and y < THRES):
         # left
         x_deg_pos -= x_average_degs
-	    return 6;
+        return 6;
     elif (x < -THRES and y < -THRES):
         # down-left
         y_deg_pos -= y_average_degs
