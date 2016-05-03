@@ -92,16 +92,11 @@ class KalmanProcessor
 			B(0,0) = src.cols / FOV_ANGLE;
 			B(1,1) = src.rows / FOV_ANGLE;
 
-			/*
-			 * TODO
-			 * Set u_k equal to the cumulative motion of the 
-			 * camera since the last update?
-			 */
 			//Sensor Motion
 			Eigen::MatrixXf u_k = Eigen::MatrixXf(2,1);
-			u_k(0,0) = 0;	//camera yaw change since last predicition 
-			u_k(1,0) = 0;	//camera pitch change since last prection
-
+			u_k(0,0) = last_read_camera_pos[0] - last_used_camera_pos[0];	//camera yaw change since last predicition 
+			u_k(1,0) = last_read_camera_pos[1] - last_used_camera_pos[1];	//camera pitch change since last prection
+			std::cout << u_k(0,0) << " " << u_k(1,0) << std::endl;
 			//Process Noise Covariance
 			Eigen::Matrix2f Q = Eigen::Matrix2f();
 			Q(0,0) = CAMERA_MOTION_X_VAR;
@@ -123,42 +118,43 @@ class KalmanProcessor
 		{
 			estimated_pos(0,0) = msg->data[0]; //x position
 			estimated_pos(1,0) = msg->data[1]; //y position
-
 			initialized = true;
 		}
+		else
+		{
+			//rows, columns
+			//Initialize variables
+			//Observation: z_k
+			Eigen::MatrixXf z_k = Eigen::MatrixXf(2,1);
+			z_k(0,0) = msg->data[0]; //x position
+			z_k(1,0) = msg->data[1]; //y position
 
-		//rows, columns
-		//Initialize variables
-		//Observation: z_k
-		Eigen::MatrixXf z_k = Eigen::MatrixXf(2,1);
-		z_k(0,0) = msg->data[0]; //x position
-		z_k(1,0) = msg->data[1]; //y position
+			//Sensor Model: H
+			Eigen::Matrix2f H = Eigen::Matrix2f();
+			H.setIdentity();
+			
+			//Residual
+			Eigen::MatrixXf resid = z_k - (H * predicted_pos);
 
-		//Sensor Model: H
-		Eigen::Matrix2f H = Eigen::Matrix2f();
-		H.setIdentity();
-		
-		//Residual
-		Eigen::MatrixXf resid = z_k - (H * predicted_pos);
+			//Sensor Noise Covariance
+			Eigen::Matrix2f R = Eigen::Matrix2f();
+			R(0,0) = CAMERA_SENSOR_X_VAR;
+			R(1,1) = CAMERA_SENSOR_Y_VAR;
 
-		//Sensor Noise Covariance
-		Eigen::Matrix2f R = Eigen::Matrix2f();
-		R(0,0) = CAMERA_SENSOR_X_VAR;
-		R(1,1) = CAMERA_SENSOR_Y_VAR;
+			//Residual covariance
+			Eigen::Matrix2f resid_cov = H * predicted_cov * H.inverse() + R;
 
-		//Residual covariance
-		Eigen::Matrix2f resid_cov = H * predicted_cov * H.inverse() + R;
+			//Kalman Coefficient
+			Eigen::Matrix2f K = predicted_cov * H.inverse() * resid_cov.inverse();
 
-		//Kalman Coefficient
-		Eigen::Matrix2f K = predicted_cov * H.inverse() * resid_cov.inverse();
+			//Estimated position
+			estimated_pos = predicted_pos + K * resid;
 
-		//Estimated position
-		estimated_pos = predicted_pos + K * resid;
-
-		//Estimated covariance
-		estimated_cov = (Eigen::Matrix2f().setIdentity() - K * H) * predicted_cov;
-		
-		std::cout << estimated_pos << "\nend\n";
+			//Estimated covariance
+			estimated_cov = (Eigen::Matrix2f().setIdentity() - K * H) * predicted_cov;
+			
+			std::cout << estimated_pos << "\nendUpdate\n";
+		}
 	}
 
 	void update_camera_angle(const geometry_msgs::Twist& twist)
