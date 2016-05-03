@@ -56,10 +56,10 @@ class KalmanProcessor
 	{
 		// Subscribe to input video feed and publish output video feed
 		image_sub_ = it_.subscribe(camera_topic, 1, 
-			&KalmanProcessor::predict, this);
-		object_sub = nh_.subscribe("/centerpoint_detected", 10,
+			&KalmanProcessor::imageForwarding, this);
+		object_sub = nh_.subscribe("/centerpoint_detected", 1,
 			&KalmanProcessor::update, this);
-		camera_angle_sub = nh_.subscribe("/ip_camera_angle", 10,
+		camera_angle_sub = nh_.subscribe("/ip_camera_angle", 1,
 			&KalmanProcessor::update_camera_angle, this);
 		image_pub_ = it_.advertise("/kalman_processor/image", 1);
 		detection_counter = DETECTION_MAX;
@@ -74,12 +74,15 @@ class KalmanProcessor
 		initialized = false;
 	}
 
-	void predict(const sensor_msgs::ImageConstPtr& msg)
+	void imageForwarding(const sensor_msgs::ImageConstPtr& msg)
 	{
 		cv_bridge::CvImagePtr cv_ptr;// = cv_bridge::toCvShare(msg);
 		cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
 		src = cv_ptr->image;
+	}
 
+	void predict()
+	{
 		//only perform predictions if a detection has occured
 		if (initialized)
 		{
@@ -96,14 +99,22 @@ class KalmanProcessor
 			Eigen::MatrixXf u_k = Eigen::MatrixXf(2,1);
 			u_k(0,0) = last_read_camera_pos[0] - last_used_camera_pos[0];	//camera yaw change since last predicition 
 			u_k(1,0) = last_read_camera_pos[1] - last_used_camera_pos[1];	//camera pitch change since last prection
-			std::cout << u_k(0,0) << " " << u_k(1,0) << std::endl;
+			std::cout << "camera: " << u_k(0,0) << " " << u_k(1,0) << std::endl;
+			last_used_camera_pos[0] = last_read_camera_pos[0];
+			last_used_camera_pos[1] = last_read_camera_pos[1];
+			
 			//Process Noise Covariance
 			Eigen::Matrix2f Q = Eigen::Matrix2f();
 			Q(0,0) = CAMERA_MOTION_X_VAR;
 			Q(1,1) = CAMERA_MOTION_Y_VAR;
-
-			predicted_pos = F * estimated_pos + B * u_k;
-			predicted_cov = F * estimated_cov + Q;
+			
+			Eigen::MatrixXf tmp = F * estimated_pos + B * u_k;
+			if (tmp(0,0) <= src.cols && tmp(0,0) >= 0 
+				&& tmp(1,0) <= src.rows && tmp(1,0) >= 0)
+			{
+				predicted_pos = F * estimated_pos + B * u_k;
+				predicted_cov = F * estimated_cov + Q;
+			}
 			drawCircle(cv::Point2f(predicted_pos(0,0), predicted_pos(1,0)), 3, 2);
 		}
 		sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", src).toImageMsg();
@@ -112,6 +123,7 @@ class KalmanProcessor
 
 	void update(const std_msgs::Float32MultiArray::ConstPtr& msg)
 	{
+		predict();
 		//if its the first detection of a series, set the initial 
 		//  position equal to the detected position
 		if (!initialized) 
@@ -147,11 +159,16 @@ class KalmanProcessor
 			//Kalman Coefficient
 			Eigen::Matrix2f K = predicted_cov * H.inverse() * resid_cov.inverse();
 
-			//Estimated position
-			estimated_pos = predicted_pos + K * resid;
+			Eigen::MatrixXf tmp = (predicted_pos + K * resid);
+			if (tmp(0,0) <= src.cols && tmp(0,0) >= 0 
+				&& tmp(1,0) <= src.rows && tmp(1,0) >= 0)
+			{
+				//Estimated position
+				estimated_pos = predicted_pos + K * resid;
 
-			//Estimated covariance
-			estimated_cov = (Eigen::Matrix2f().setIdentity() - K * H) * predicted_cov;
+				//Estimated covariance
+				estimated_cov = (Eigen::Matrix2f().setIdentity() - K * H) * predicted_cov;
+			}
 			
 			std::cout << estimated_pos << "\nendUpdate\n";
 		}
