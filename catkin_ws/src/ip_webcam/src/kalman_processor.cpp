@@ -72,6 +72,8 @@ class KalmanProcessor
 		last_read_camera_pos[0] = 0;
 		last_read_camera_pos[1] = 0;
 		initialized = false;
+
+
 	}
 
 	void imageForwarding(const sensor_msgs::ImageConstPtr& msg)
@@ -102,7 +104,7 @@ class KalmanProcessor
 			std::cout << "camera: " << u_k(0,0) << " " << u_k(1,0) << std::endl;
 			last_used_camera_pos[0] = last_read_camera_pos[0];
 			last_used_camera_pos[1] = last_read_camera_pos[1];
-			
+
 			//Process Noise Covariance
 			Eigen::Matrix2f Q = Eigen::Matrix2f();
 			Q(0,0) = CAMERA_MOTION_X_VAR;
