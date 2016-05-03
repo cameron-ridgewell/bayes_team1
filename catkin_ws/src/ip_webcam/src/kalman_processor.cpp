@@ -39,6 +39,7 @@ class KalmanProcessor
 	image_transport::Subscriber image_sub_;
 	image_transport::Publisher image_pub_;
 	ros::Subscriber object_sub;
+	ros::Subscriber camera_angle_sub;
 	cv::Mat src;
 	std::vector<float> objects;
 	size_t detection_counter;
@@ -55,6 +56,8 @@ class KalmanProcessor
 		image_sub_ = it_.subscribe(camera_topic, 1, 
 			&KalmanProcessor::predict, this);
 		object_sub = nh_.subscribe("/centerpoint_detected", 10,
+			&KalmanProcessor::update, this);
+		camera_angle_sub = nh_.subscribe("/ip_camera_angle", 10,
 			&KalmanProcessor::update, this);
 		detection_counter = DETECTION_MAX;
 		predicted_pos = Eigen::MatrixXf(2,1);
