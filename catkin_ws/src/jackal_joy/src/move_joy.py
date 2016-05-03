@@ -3,7 +3,6 @@ import rospy
 from sensor_msgs.msg import Joy
 import urllib2
 import time 
-import cv2
 from geometry_msgs.msg import Twist
 import threading
 import sys
