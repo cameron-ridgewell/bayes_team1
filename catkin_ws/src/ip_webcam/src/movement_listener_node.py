@@ -4,8 +4,8 @@ import urllib2, rospy
 from time import sleep
 from geometry_msgs.msg import Twist
 
-x_average_degs = 1.3178917
-y_average_degs = 1.3267467
+x_average_degs = 0.5 #1.3178917
+y_average_degs = 0.5 #1.3267467
 
 x_deg_pos = 0;
 y_deg_pos = 0;
