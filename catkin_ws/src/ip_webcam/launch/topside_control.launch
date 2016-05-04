@@ -4,4 +4,15 @@
 	<node name="joy" pkg="joy" type="joy_node"/>
 
 	<node name="jackal_joy" pkg="jackal_joy" type="move_joy.py"/>
+
+	<node name="ip_webcam" pkg="ip_webcam" type="ip_webcam_node"/>
+
+	<node name="find_object_2d" pkg="find_object_2d" type="find_object_2d" output="screen">
+		<remap from="image" to="networkCam"/>
+		<param name="gui" value="false" type="bool"/>
+		<param name="settings_path" value="$(find ip_webcam)/src/find_object_settings_ORB.ini" type="str"/>
+		<param name="objects_path" value="$(find ip_webcam)/wrench_objects/" type="str"/>
+		<param name="object_prefix" value="object" type="str"/>
+	</node>
+
 </launch>
