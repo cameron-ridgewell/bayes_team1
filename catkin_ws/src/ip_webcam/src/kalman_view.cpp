@@ -117,7 +117,7 @@ class KalmanView
 
 	void drawEstimation()
 	{
-		if (estimated_pos(0,0) > 0 && estimated_pos(1,0) > 0)
+		if (predicted_pos(0,0) > 0 && predicted_pos(1,0) > 0)
 		{
 			// cv::circle(src, cv::Point2f(predicted_pos(0,0), predicted_pos(1,0)), 
 			// 	3, cv::Scalar(255,0,0), 2);

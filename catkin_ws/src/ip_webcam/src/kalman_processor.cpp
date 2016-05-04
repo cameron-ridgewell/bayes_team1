@@ -18,6 +18,8 @@
 #include <functional>
 #include <boost/lexical_cast.hpp>
 #include <Eigen/Dense>
+#include <time.h>
+
 //1400 mm away
 //x and y variance of find object 2d
 static const float CAMERA_SENSOR_X_VAR = 6.9405;
@@ -30,20 +32,24 @@ static const float CAMERA_MOTION_Y_VAR = .4728;//0.0486310;
 static const float IMAGE_WIDTH = 640;
 static const float IMAGE_HEIGHT = 480;
 
-std::string camera_topic = "/networkCam";
+static const std::string CAMERA_TOPIC = "/networkCam";
 
 static const float FOV_ANGLE = 40; //degrees
-static const size_t DETECTION_MAX = 10;
+static const time_t DETECTION_MAX = 0;
+
+static bool searching = true;
 
 class KalmanProcessor
 {
 	ros::NodeHandle nh_;
 	ros::Subscriber object_sub;
 	ros::Subscriber camera_angle_sub;
+	image_transport::ImageTransport it_;
+	image_transport::Subscriber image_sub_;
 	ros::Publisher prediction;
 	ros::Publisher estimation;
 	std::vector<float> objects;
-	size_t detection_counter;
+	time_t detection_counter;
 	Eigen::MatrixXf predicted_pos;
 	Eigen::Matrix2f predicted_cov;
 	Eigen::MatrixXf estimated_pos;
@@ -53,8 +59,10 @@ class KalmanProcessor
 	bool initialized;
 
 	public:
-	KalmanProcessor()
+	KalmanProcessor():it_(nh_)
 	{
+		image_sub_ = it_.subscribe(CAMERA_TOPIC, 1, 
+			&KalmanProcessor::checkActive, this);
 		object_sub = nh_.subscribe("/centerpoint_detected", 1,
 			&KalmanProcessor::update, this);
 		camera_angle_sub = nh_.subscribe("/ip_camera_angle", 1,
@@ -73,6 +81,11 @@ class KalmanProcessor
 		last_read_camera_pos[0] = 0;
 		last_read_camera_pos[1] = 0;
 		initialized = false;
+	}
+
+	~KalmanProcessor()
+	{
+		searching = false;
 	}
 
 	void predict()
@@ -110,32 +123,32 @@ class KalmanProcessor
 			{
 				estimated_pos = predicted_pos = F * estimated_pos + B * u_k;
 				estimated_cov = predicted_cov = F * estimated_cov + Q;
-				std::vector<float> tmp;
-				tmp.push_back(predicted_pos(0,0));
-				tmp.push_back(predicted_pos(1,0));
-				tmp.push_back(predicted_cov(0,0));
-				tmp.push_back(predicted_cov(0,1));
-				tmp.push_back(predicted_cov(1,0));
-				tmp.push_back(predicted_cov(1,1));
+				std::vector<float> tmp2;
+				tmp2.push_back(predicted_pos(0,0));
+				tmp2.push_back(predicted_pos(1,0));
+				tmp2.push_back(predicted_cov(0,0));
+				tmp2.push_back(predicted_cov(0,1));
+				tmp2.push_back(predicted_cov(1,0));
+				tmp2.push_back(predicted_cov(1,1));
 				std_msgs::Float32MultiArray msg;
-				msg.data = tmp;
+				msg.data = tmp2;
 				prediction.publish(msg);
 			}
 			if (predicted_pos(0,0) < 1 && predicted_pos(1,0) < 1)
 			{
-				predicted_pos(0,0) = 0;
-				predicted_pos(1,0) = 0;
-				initialized = false;	
+				reset();	
 			}
 		}
 	}
 
 	void update(const std_msgs::Float32MultiArray::ConstPtr& msg)
 	{
+		time(&detection_counter);
 		//if its the first detection of a series, set the initial 
 		//  position equal to the detected position
 		if (!initialized) 
 		{
+			std::cerr << "Initializing...\n";
 			estimated_pos(0,0) = msg->data[0]; //x position
 			estimated_pos(1,0) = msg->data[1]; //y position
 			initialized = true;
@@ -143,9 +156,9 @@ class KalmanProcessor
 		}
 		else
 		{
-
-			predicted_pos(0,0) = msg->data[0]; //x position
-			predicted_pos(1,0) = msg->data[1]; //y position
+			predict();
+			// predicted_pos(0,0) = msg->data[0]; //x position
+			// predicted_pos(1,0) = msg->data[1]; //y position
 			//rows, columns
 			//Initialize variables
 			//Observation: z_k
@@ -181,15 +194,15 @@ class KalmanProcessor
 				//Estimated covariance
 				estimated_cov = (Eigen::Matrix2f().setIdentity() - K * H) * predicted_cov;
 
-				std::vector<float> tmp;
-				tmp.push_back(estimated_pos(0,0));
-				tmp.push_back(estimated_pos(1,0));
-				tmp.push_back(estimated_cov(0,0));
-				tmp.push_back(estimated_cov(0,1));
-				tmp.push_back(estimated_cov(1,0));
-				tmp.push_back(estimated_cov(1,1));
+				std::vector<float> tmp2;
+				tmp2.push_back(estimated_pos(0,0));
+				tmp2.push_back(estimated_pos(1,0));
+				tmp2.push_back(estimated_cov(0,0));
+				tmp2.push_back(estimated_cov(0,1));
+				tmp2.push_back(estimated_cov(1,0));
+				tmp2.push_back(estimated_cov(1,1));
 				std_msgs::Float32MultiArray msg;
-				msg.data = tmp;
+				msg.data = tmp2;
 				estimation.publish(msg);
 			}
 			
@@ -202,6 +215,33 @@ class KalmanProcessor
 		last_read_camera_pos[0] = twist.angular.z; //yaw
 		last_read_camera_pos[1] = twist.angular.x; //pitch
 		predict();
+	}
+
+	void reset()
+	{
+		predicted_pos(0,0) = 0;
+		predicted_pos(1,0) = 0;
+		initialized = false;
+	}
+
+	void checkActive(const sensor_msgs::ImageConstPtr& msg)
+	{
+		time_t now;
+		time(&now);
+		if(difftime(now, detection_counter) > 4)
+		{
+			reset();
+			std::vector<float> tmp2;
+			tmp2.push_back(0);
+			tmp2.push_back(0);
+			tmp2.push_back(0);
+			tmp2.push_back(0);
+			tmp2.push_back(0);
+			tmp2.push_back(0);
+			std_msgs::Float32MultiArray msg;
+			msg.data = tmp2;
+			prediction.publish(msg);
+		} 
 	}
 };
 
