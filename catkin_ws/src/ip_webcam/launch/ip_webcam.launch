@@ -1,15 +1,13 @@
 <launch>
 	<arg name="camera_ip" default="192.168.1.12" />
 	<arg name="camera_port" default="81"/>
-
- 	<node name="ip_webcam" pkg="ip_webcam" type="ip_webcam_node"/>
 <!--
-  <node name="joy_node" pkg="joy" type="joy_node"/>
+ 	<node name="ip_webcam" pkg="ip_webcam" type="ip_webcam_node"/>
 -->
   <node name="camera_movement_listener" pkg="ip_webcam" type="movement_listener_node.py"/>
 
   <node name="camera_joystick_listener" pkg="ip_webcam" type="joy_handler.py"/>
-
+<!--
   <node name="find_object_2d" pkg="find_object_2d" type="find_object_2d" output="screen">
     <remap from="image" to="networkCam"/>
     <param name="gui" value="false" type="bool"/>
@@ -17,6 +15,7 @@
     <param name="objects_path" value="$(find ip_webcam)/wrench_objects/" type="str"/>
     <param name="object_prefix" value="object" type="str"/>
   </node>
+-->
   <node name="pan_tilt_correction" pkg="ip_webcam" type="object_tracker"/>
 
 </launch>
