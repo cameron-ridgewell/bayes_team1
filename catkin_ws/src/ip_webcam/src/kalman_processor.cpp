@@ -20,12 +20,12 @@
 #include <Eigen/Dense>
 //1400 mm away
 //x and y variance of find object 2d
-static const float CAMERA_SENSOR_X_VAR = 40.9405;
-static const float CAMERA_SENSOR_Y_VAR = 921.5028;
+static const float CAMERA_SENSOR_X_VAR = 6.9405;
+static const float CAMERA_SENSOR_Y_VAR = 30.5028;
 
 //x and y variance of motion of the pan tilt camera
-static const float CAMERA_MOTION_X_VAR = 0.0381116;
-static const float CAMERA_MOTION_Y_VAR = 0.0486310;
+static const float CAMERA_MOTION_X_VAR = .4728;//0.0381116;
+static const float CAMERA_MOTION_Y_VAR = .4728;//0.0486310;
 
 static const float IMAGE_WIDTH = 640;
 static const float IMAGE_HEIGHT = 480;
@@ -108,8 +108,8 @@ class KalmanProcessor
 			if (tmp(0,0) <= IMAGE_WIDTH && tmp(0,0) >= 0 
 				&& tmp(1,0) <= IMAGE_HEIGHT && tmp(1,0) >= 0)
 			{
-				predicted_pos = F * estimated_pos + B * u_k;
-				predicted_cov = F * estimated_cov + Q;
+				estimated_pos = predicted_pos = F * estimated_pos + B * u_k;
+				estimated_cov = predicted_cov = F * estimated_cov + Q;
 				std::vector<float> tmp;
 				tmp.push_back(predicted_pos(0,0));
 				tmp.push_back(predicted_pos(1,0));
@@ -120,6 +120,12 @@ class KalmanProcessor
 				std_msgs::Float32MultiArray msg;
 				msg.data = tmp;
 				prediction.publish(msg);
+			}
+			if (predicted_pos(0,0) < 1 && predicted_pos(1,0) < 1)
+			{
+				predicted_pos(0,0) = 0;
+				predicted_pos(1,0) = 0;
+				initialized = false;	
 			}
 		}
 	}
@@ -133,10 +139,13 @@ class KalmanProcessor
 			estimated_pos(0,0) = msg->data[0]; //x position
 			estimated_pos(1,0) = msg->data[1]; //y position
 			initialized = true;
+			predict();
 		}
 		else
 		{
-			predict();
+
+			predicted_pos(0,0) = msg->data[0]; //x position
+			predicted_pos(1,0) = msg->data[1]; //y position
 			//rows, columns
 			//Initialize variables
 			//Observation: z_k

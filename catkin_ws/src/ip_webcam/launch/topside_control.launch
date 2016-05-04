@@ -15,4 +15,7 @@
 		<param name="object_prefix" value="object" type="str"/>
 	</node>
 
+	<node name="kalman_viewer" pkg="ip_webcam" type="kalman_view"/>
+	<node name="kalman_processor" pkg="ip_webcam" type="kalman_processor"/>
+
 </launch>

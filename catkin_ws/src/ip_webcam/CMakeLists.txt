@@ -55,6 +55,7 @@ include_directories(
 add_executable(ip_webcam_node src/ip_webcam_node.cpp)
 add_executable(object_tracker src/object_tracker.cpp)
 add_executable(kalman_processor src/kalman_processor.cpp)
+add_executable(kalman_view src/kalman_view.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
@@ -70,6 +71,10 @@ target_link_libraries(object_tracker
   ${OpenCV_LIBS}
 )
 target_link_libraries(kalman_processor
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBS}
+)
+target_link_libraries(kalman_view
   ${catkin_LIBRARIES}
   ${OpenCV_LIBS}
 )
