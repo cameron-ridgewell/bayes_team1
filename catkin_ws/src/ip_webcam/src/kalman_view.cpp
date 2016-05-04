@@ -111,7 +111,7 @@ class KalmanView
 			// 	3, cv::Scalar(255,0,0), 2);
 			cv::ellipse(src, cv::Point2f(predicted_pos(0,0), predicted_pos(1,0)),
 				cv::Size(predicted_cov(1,1)*2, predicted_cov(0,0)*2), 
-				0.0, 0.0, 360.0, cv::Scalar(255,0,0), 1);
+				0.0, 0.0, 360.0, cv::Scalar(0,0,255), 2);
 		}
 	}
 
@@ -123,7 +123,7 @@ class KalmanView
 			// 	3, cv::Scalar(255,0,0), 2);
 			cv::ellipse(src, cv::Point2f(estimated_pos(0,0), estimated_pos(1,0)),
 				cv::Size(estimated_cov(1,1)*2, estimated_cov(0,0)*2), 
-				0.0, 0.0, 360.0, cv::Scalar(0,255,0), 1);
+				0.0, 0.0, 360.0, cv::Scalar(255,0,0), 2);
 		}
 	}
 };
