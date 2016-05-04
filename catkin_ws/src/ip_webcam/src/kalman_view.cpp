@@ -18,16 +18,23 @@
 #include <functional>
 #include <boost/lexical_cast.hpp>
 #include <Eigen/Dense>
+#include <string>
 
 static const size_t DETECTION_MAX = 10;
 static const std::string CAMERA_TOPIC = "/networkCam";
 class KalmanView
 {
+
+	struct odomObject{
+		float x, y, z, roll, pitch, yaw;
+	};
+
 	ros::NodeHandle nh_;
 	image_transport::ImageTransport it_;
 	image_transport::Subscriber image_sub_;
 	image_transport::Publisher image_pub_;
 	ros::Subscriber object_sub;
+	ros::Subscriber odom_sub;
 	ros::Subscriber prediction;
 	ros::Subscriber estimation;
 	size_t detection_counter;
@@ -37,6 +44,7 @@ class KalmanView
 	Eigen::MatrixXf estimated_pos;
 	Eigen::Matrix2f estimated_cov;
 	cv::Mat src;
+	odomObject myOdom;
 
 	public:
 	KalmanView(): it_(nh_)
@@ -50,6 +58,8 @@ class KalmanView
 		estimation = nh_.subscribe("/kalman/estimation", 1, 
 			&KalmanView::updateEstimation, this);
 		image_pub_ = it_.advertise("/kalman_viewer/image", 1);
+		odom_sub = nh_.subscribe("/odom/position", 1,
+			&KalmanView::updateOdom, this);
 
 		detection_counter = DETECTION_MAX;
 
@@ -86,6 +96,16 @@ class KalmanView
 		estimated_cov(1,1) = msg->data[5];
 	}
 
+	void updateOdom(const std_msgs::Float32MultiArray::ConstPtr& msg)
+	{
+		myOdom.x = msg->data[0];
+		myOdom.y = msg->data[1];
+		myOdom.z = msg->data[2];
+		myOdom.roll = msg->data[3];
+		myOdom.pitch = msg->data[4];
+		myOdom.yaw = msg->data[5];	
+	}
+
 	void showImage(const sensor_msgs::ImageConstPtr& msg)
 	{
 		cv_bridge::CvImagePtr cv_ptr;// = cv_bridge::toCvShare(msg);
@@ -94,6 +114,7 @@ class KalmanView
 
 		drawPrediction();
 		drawEstimation();
+		drawPosition();
 
 		// Output modified video stream
 		cv_bridge::CvImage out_msg;
@@ -125,6 +146,13 @@ class KalmanView
 				cv::Size(estimated_cov(1,1)*2, estimated_cov(0,0)*2), 
 				0.0, 0.0, 360.0, cv::Scalar(255,0,0), 2);
 		}
+	}
+	void drawPosition()
+	{
+		std::string text = "x:" + std::to_string(myOdom.x) 
+			+ " y:" + std::to_string(myOdom.y); 
+		cv::putText(src, text, cv::Point2f(30,30), cv::FONT_HERSHEY_PLAIN, 
+			2, cv::Scalar(255,0,0), 2);
 	}
 };
 
