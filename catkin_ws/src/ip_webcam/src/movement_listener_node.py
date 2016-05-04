@@ -56,9 +56,6 @@ def getTwist(twist):
         return -1;
 
 def sendOneMovement(comm):
-    global x_deg_pos
-    global y_deg_pos
-    
     if comm < 0:
         return;
     ip = rospy.get_param("camera_ip", "192.168.1.12");
@@ -70,6 +67,8 @@ def sendOneMovement(comm):
     urllib2.urlopen(url_prefix +'&command=7&onestep=1&14434782369140.2543632062152028&_=1443478236914');
     pub = rospyPublisher = rospy.Publisher("/ip_camera_angle", Twist, queue_size=10)
     twist = Twist()
+    global x_deg_pos
+    global y_deg_pos
     twist.angular.z = x_deg_pos
     twist.angular.x = y_deg_pos
     pub.publish(twist)
