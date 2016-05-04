@@ -27,6 +27,9 @@ static const float CAMERA_SENSOR_Y_VAR = 921.5028;
 static const float CAMERA_MOTION_X_VAR = 0.0381116;
 static const float CAMERA_MOTION_Y_VAR = 0.0486310;
 
+static const float IMAGE_WIDTH = 640;
+static const float IMAGE_HEIGHT = 480;
+
 std::string camera_topic = "/networkCam";
 
 static const float FOV_ANGLE = 40; //degrees
@@ -35,12 +38,10 @@ static const size_t DETECTION_MAX = 10;
 class KalmanProcessor
 {
 	ros::NodeHandle nh_;
-	image_transport::ImageTransport it_;
-	image_transport::Subscriber image_sub_;
-	image_transport::Publisher image_pub_;
 	ros::Subscriber object_sub;
 	ros::Subscriber camera_angle_sub;
-	cv::Mat src;
+	ros::Publisher prediction;
+	ros::Publisher estimation;
 	std::vector<float> objects;
 	size_t detection_counter;
 	Eigen::MatrixXf predicted_pos;
@@ -52,16 +53,16 @@ class KalmanProcessor
 	bool initialized;
 
 	public:
-	KalmanProcessor(): it_(nh_)
+	KalmanProcessor()
 	{
-		// Subscribe to input video feed and publish output video feed
-		image_sub_ = it_.subscribe(camera_topic, 1, 
-			&KalmanProcessor::imageForwarding, this);
 		object_sub = nh_.subscribe("/centerpoint_detected", 1,
 			&KalmanProcessor::update, this);
 		camera_angle_sub = nh_.subscribe("/ip_camera_angle", 1,
 			&KalmanProcessor::update_camera_angle, this);
-		image_pub_ = it_.advertise("/kalman_processor/image", 1);
+		prediction = nh_.advertise<std_msgs::Float32MultiArray>
+			("/kalman/prediction",1);
+		estimation = nh_.advertise<std_msgs::Float32MultiArray>
+			("/kalman/estimation",1);
 		detection_counter = DETECTION_MAX;
 		predicted_pos = Eigen::MatrixXf(2,1);
 		predicted_cov = Eigen::Matrix2f();
@@ -72,15 +73,6 @@ class KalmanProcessor
 		last_read_camera_pos[0] = 0;
 		last_read_camera_pos[1] = 0;
 		initialized = false;
-
-
-	}
-
-	void imageForwarding(const sensor_msgs::ImageConstPtr& msg)
-	{
-		cv_bridge::CvImagePtr cv_ptr;// = cv_bridge::toCvShare(msg);
-		cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-		src = cv_ptr->image;
 	}
 
 	void predict()
@@ -94,13 +86,15 @@ class KalmanProcessor
 
 			//Sensor Motion Model
 			Eigen::Matrix2f B = Eigen::Matrix2f();
-			B(0,0) = src.cols / FOV_ANGLE;
-			B(1,1) = src.rows / FOV_ANGLE;
+			B(0,0) = IMAGE_WIDTH / FOV_ANGLE;
+			B(1,1) = IMAGE_HEIGHT / FOV_ANGLE;
 
 			//Sensor Motion
 			Eigen::MatrixXf u_k = Eigen::MatrixXf(2,1);
-			u_k(0,0) = last_read_camera_pos[0] - last_used_camera_pos[0];	//camera yaw change since last predicition 
-			u_k(1,0) = last_read_camera_pos[1] - last_used_camera_pos[1];	//camera pitch change since last prection
+			u_k(0,0) = last_read_camera_pos[0] 
+				- last_used_camera_pos[0];	//camera yaw change since last predicition 
+			u_k(1,0) = last_read_camera_pos[1] 
+				- last_used_camera_pos[1];	//camera pitch change since last prediction
 			std::cout << "camera: " << u_k(0,0) << " " << u_k(1,0) << std::endl;
 			last_used_camera_pos[0] = last_read_camera_pos[0];
 			last_used_camera_pos[1] = last_read_camera_pos[1];
@@ -111,21 +105,27 @@ class KalmanProcessor
 			Q(1,1) = CAMERA_MOTION_Y_VAR;
 			
 			Eigen::MatrixXf tmp = F * estimated_pos + B * u_k;
-			if (tmp(0,0) <= src.cols && tmp(0,0) >= 0 
-				&& tmp(1,0) <= src.rows && tmp(1,0) >= 0)
+			if (tmp(0,0) <= IMAGE_WIDTH && tmp(0,0) >= 0 
+				&& tmp(1,0) <= IMAGE_HEIGHT && tmp(1,0) >= 0)
 			{
 				predicted_pos = F * estimated_pos + B * u_k;
 				predicted_cov = F * estimated_cov + Q;
+				std::vector<float> tmp;
+				tmp.push_back(predicted_pos(0,0));
+				tmp.push_back(predicted_pos(1,0));
+				tmp.push_back(predicted_cov(0,0));
+				tmp.push_back(predicted_cov(0,1));
+				tmp.push_back(predicted_cov(1,0));
+				tmp.push_back(predicted_cov(1,1));
+				std_msgs::Float32MultiArray msg;
+				msg.data = tmp;
+				prediction.publish(msg);
 			}
-			drawCircle(cv::Point2f(predicted_pos(0,0), predicted_pos(1,0)), 3, 2);
 		}
-		sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", src).toImageMsg();
-		image_pub_.publish(img_msg);
 	}
 
 	void update(const std_msgs::Float32MultiArray::ConstPtr& msg)
 	{
-		predict();
 		//if its the first detection of a series, set the initial 
 		//  position equal to the detected position
 		if (!initialized) 
@@ -136,6 +136,7 @@ class KalmanProcessor
 		}
 		else
 		{
+			predict();
 			//rows, columns
 			//Initialize variables
 			//Observation: z_k
@@ -162,14 +163,25 @@ class KalmanProcessor
 			Eigen::Matrix2f K = predicted_cov * H.inverse() * resid_cov.inverse();
 
 			Eigen::MatrixXf tmp = (predicted_pos + K * resid);
-			if (tmp(0,0) <= src.cols && tmp(0,0) >= 0 
-				&& tmp(1,0) <= src.rows && tmp(1,0) >= 0)
+			if (tmp(0,0) <= IMAGE_WIDTH && tmp(0,0) >= 0 
+				&& tmp(1,0) <= IMAGE_HEIGHT && tmp(1,0) >= 0)
 			{
 				//Estimated position
 				estimated_pos = predicted_pos + K * resid;
 
 				//Estimated covariance
 				estimated_cov = (Eigen::Matrix2f().setIdentity() - K * H) * predicted_cov;
+
+				std::vector<float> tmp;
+				tmp.push_back(estimated_pos(0,0));
+				tmp.push_back(estimated_pos(1,0));
+				tmp.push_back(estimated_cov(0,0));
+				tmp.push_back(estimated_cov(0,1));
+				tmp.push_back(estimated_cov(1,0));
+				tmp.push_back(estimated_cov(1,1));
+				std_msgs::Float32MultiArray msg;
+				msg.data = tmp;
+				estimation.publish(msg);
 			}
 			
 			std::cout << estimated_pos << "\nendUpdate\n";
@@ -180,11 +192,7 @@ class KalmanProcessor
 	{
 		last_read_camera_pos[0] = twist.angular.z; //yaw
 		last_read_camera_pos[1] = twist.angular.x; //pitch
-	}
-
-	void drawCircle(const cv::Point2f point, const int radius, const size_t circle_width)
-	{
-		cv::circle(src, point, radius, cv::Scalar(255,0,0), circle_width);
+		predict();
 	}
 };
 
